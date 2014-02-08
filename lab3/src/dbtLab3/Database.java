@@ -100,4 +100,19 @@ public class Database {
 		return null;
 	}
 
+	public Performance getPerformance(String movieName, String date) {
+		
+		
+		return null;
+	}
+
+	/**
+	 * Books a ticket for the performance
+	 * @param performance
+	 */
+	public void bookTicket(String movieName,String date) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
