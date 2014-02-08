@@ -119,9 +119,4 @@ public class Database {
 		
 	}
 
-	public LinkedList<String> getMovieDates(String movieName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

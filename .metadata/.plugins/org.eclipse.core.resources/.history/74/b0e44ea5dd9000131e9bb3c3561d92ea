@@ -220,7 +220,7 @@ public class BookingPane extends BasicPane {
 			}
 			String movieName = nameList.getSelectedValue();
 			dateListModel.removeAllElements();
-			LinkedList<String> dates = db.getMovieDates(movieName);
+			LinkedList<String> dates = db.getDates(movieName);
 			for(String date : dates) {
 				dateListModel.addElement(date);
 			}
