@@ -12,6 +12,11 @@ public class Database {
 	 * The database connection.
 	 */
 	private Connection conn;
+	private String userNameQuery;
+	private String movieQuery;
+	private String dateQuery;
+	private String performanceQuery;
+	private String bookQuery;
 
 	/**
 	 * Create the database interface object. Connection to the database is
@@ -19,6 +24,11 @@ public class Database {
 	 */
 	public Database() {
 		conn = null;
+		  userNameQuery = "SELECT name FROM Users WHERE userName = ?";
+		  moviesQuery = "SELECT name FROM Movies";
+		  dateQuery = "SELECT showDate FROM Performances WHERE movieName = ?";
+		  performanceQuery = "SELECT freeSeats, theaterName FROM Performances WHERE movieName = ? and showDate = ?";
+		  bookQuery = "insert into Tickets ";
 	}
 
 	/**
@@ -86,8 +96,26 @@ public class Database {
 	 * @return list of all movies in database
 	 */
 	public LinkedList<String> getmovies() {
-		// TODO Auto-generated method stub
-		return null;
+	
+	ResultSet sqlMovies;
+	PreparedStatement getMovies;
+	
+	LinkedList<String> dates = new LinkedList<String>();
+
+	try{
+		getMovies = conn.prepareStatement(movieQuery);
+		sqlMovies = getMovies.executeQuery();
+
+		while(sqlMovies.next()){
+			dates.add(sqlMovies.getString("name"));
+		}
+
+	} catch(SQLException e){
+		e.printStackTrace();
+	}
+			
+	return dates;
+	
 	}
 
 	/**
@@ -95,11 +123,25 @@ public class Database {
 	 * @param movieName
 	 * @return returns a list of all dates for movie movieName
 	 */
-	public LinkedList<String> getDates(){
-		LinkedList<String> dates = new LinkedList<String>();
+	public LinkedList<String> getDates(String movie){
+		ResultSet sqlDates;
+		PreparedStatement getDates;
 		
-		// preparsed sql statement?
+		LinkedList<String> dates = new LinkedList<String>();
+
+		try{
+			getDates = conn.prepareStatement(dateQuery);
+			getDates.setString(1, movie);
+			sqlDates = getDates.executeQuery();
+
+			while(sqlDates.next()){
+				dates.add(sqlDates.getString("showDate"));
+			}
 	
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+				
 		return dates;
 		
 	}
