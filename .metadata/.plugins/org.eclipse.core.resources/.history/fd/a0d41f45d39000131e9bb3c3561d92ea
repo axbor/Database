@@ -1,0 +1,9 @@
+package dbtLab3;
+
+public class Performance {
+	
+	public Performance(String movieName, String theaterName, Date date, int nbrOfSeats){
+		
+	}
+
+}

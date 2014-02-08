@@ -146,4 +146,24 @@ public class Database {
 		
 	}
 
+	public Performance getPerformance(String movieName, String date) {
+		
+		
+		return null;
+	}
+
+	/**
+	 * Books a ticket for the performance
+	 * @param performance
+	 */
+	public void bookTicket(String movieName,String date) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public LinkedList<String> getMovieDates(String movieName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -1,0 +1,11 @@
+package dbtLab3;
+
+import java.sql.Date;
+
+public class Performance {
+	
+	public Performance(String movieName, String theaterName, Date date, int nbrOfSeats){
+		
+	}
+
+}
