@@ -95,9 +95,13 @@ public class Database {
 	 * @param movieName
 	 * @return returns a list of all dates for movie movieName
 	 */
-	public LinkedList<String> getDates(String movieName) {
-		// TODO Auto-generated method stub
-		return null;
+	public LinkedList<String> getDates(){
+		LinkedList<String> dates = new LinkedList<String>();
+		
+		// preparsed sql statement?
+	
+		return dates;
+		
 	}
 
 	public Performance getPerformance(String movieName, String date) {
