@@ -1,6 +1,7 @@
 package dbtLab3;
 
 import java.sql.*;
+import java.util.LinkedList;
 
 /**
  * Database is a class that specifies the interface to the movie database. Uses
@@ -77,9 +78,26 @@ public class Database {
 	 * @return true if userId exists in database
 	 */
 	public boolean checkUser(String userId) {
-		if(userId.length() > 0 ) return true;
 		return false;
 	}
-	/* --- insert own code here --- */
+
+	/**
+	 * 
+	 * @return list of all movies in database
+	 */
+	public LinkedList<String> getmovies() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param movieName
+	 * @return returns a list of all dates for movie movieName
+	 */
+	public LinkedList<String> getDates(String movieName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

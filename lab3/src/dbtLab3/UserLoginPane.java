@@ -85,7 +85,6 @@ public class UserLoginPane extends BasicPane {
 			if(db.checkUser(userId)){
 				CurrentUser current = CurrentUser.instance();
 				current.loginAs(userId);
-				System.out.println(userId + " is logged in");
 			}
 		}
 	}

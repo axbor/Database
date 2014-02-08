@@ -5,6 +5,7 @@ import javax.swing.event.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.LinkedList;
 
 /**
  * The GUI pane where a user books tickets for movie performances. It contains
@@ -172,7 +173,10 @@ public class BookingPane extends BasicPane {
 	 */
 	private void fillNameList() {
 		nameListModel.removeAllElements();
-        /* --- insert own code here --- */
+		LinkedList<String> movies = db.getmovies();
+		for(String s : movies){
+			nameListModel.addElement(s);
+		}
 	}
 
 	/**
@@ -210,7 +214,11 @@ public class BookingPane extends BasicPane {
 				return;
 			}
 			String movieName = nameList.getSelectedValue();
-			/* --- insert own code here --- */
+			dateListModel.removeAllElements();
+			LinkedList<String> dates = db.getDates(movieName);
+			for(String date : dates) {
+				dateListModel.addElement(date);
+			}
 		}
 	}
 
