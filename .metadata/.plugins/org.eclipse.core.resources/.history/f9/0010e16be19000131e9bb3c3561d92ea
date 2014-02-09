@@ -25,7 +25,7 @@ public class Database {
 	public Database() {
 		conn = null;
 		  userNameQuery = "SELECT name FROM Users WHERE userName = ?";
-		  movieQuery = "SELECT name FROM Movies";
+		  moviesQuery = "SELECT name FROM Movies";
 		  dateQuery = "SELECT showDate FROM Performances WHERE movieName = ?";
 		  performanceQuery = "SELECT freeSeats, theaterName FROM Performances WHERE movieName = ? and showDate = ?";
 		  bookQuery = "insert into Tickets ";
@@ -162,20 +162,8 @@ public class Database {
 	}
 
 	public LinkedList<String> getMovieDates(String movieName) {
-		PreparedStatement getDates;
-		ResultSet sqlDates;
-		LinkedList<String> dates = new LinkedList<String>();
-		try {
-			getDates = conn.prepareStatement(dateQuery);
-			getDates.setString(1, movieName);
-			sqlDates = getDates.executeQuery();
-			while(sqlDates.next()) {
-				dates.add(sqlDates.getString("showDate"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return dates;
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

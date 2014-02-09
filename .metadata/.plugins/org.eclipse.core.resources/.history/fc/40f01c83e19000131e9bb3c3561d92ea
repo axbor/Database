@@ -186,13 +186,19 @@ public class BookingPane extends BasicPane {
 	private void fillDateList(String movie) {
 		dateListModel.removeAllElements();
 		
-		LinkedList<String> dates = db.getDates(movie);
+		ResultSet dates = db.getDates(movie);
 		
 		for(String date : dates){
 			dateListModel.addElement(date);
 		}
+<<<<<<< HEAD
+		
+        /* --- insert own code here --- */
 	}
 	
+=======
+	}
+>>>>>>> dab24e6ef125d5530fdde9d0616354958a467088
 
 	/**
 	 * Clear all text fields.

@@ -165,6 +165,7 @@ public class Database {
 		PreparedStatement getDates;
 		ResultSet sqlDates;
 		LinkedList<String> dates = new LinkedList<String>();
+		
 		try {
 			getDates = conn.prepareStatement(dateQuery);
 			getDates.setString(1, movieName);

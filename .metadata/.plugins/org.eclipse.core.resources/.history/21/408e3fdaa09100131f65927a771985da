@@ -162,20 +162,8 @@ public class Database {
 	}
 
 	public LinkedList<String> getMovieDates(String movieName) {
-		PreparedStatement getDates;
-		ResultSet sqlDates;
-		LinkedList<String> dates = new LinkedList<String>();
-		try {
-			getDates = conn.prepareStatement(dateQuery);
-			getDates.setString(1, movieName);
-			sqlDates = getDates.executeQuery();
-			while(sqlDates.next()) {
-				dates.add(sqlDates.getString("showDate"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return dates;
+		
+		return null;
 	}
 
 }

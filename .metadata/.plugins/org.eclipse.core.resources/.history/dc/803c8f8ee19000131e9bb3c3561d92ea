@@ -186,7 +186,7 @@ public class BookingPane extends BasicPane {
 	private void fillDateList(String movie) {
 		dateListModel.removeAllElements();
 		
-		LinkedList<String> dates = db.getDates(movie);
+		LinkedList<Date> dates = db.getDates(movie);
 		
 		for(String date : dates){
 			dateListModel.addElement(date);

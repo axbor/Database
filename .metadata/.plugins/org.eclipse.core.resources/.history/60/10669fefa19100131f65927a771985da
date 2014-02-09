@@ -165,6 +165,7 @@ public class Database {
 		PreparedStatement getDates;
 		ResultSet sqlDates;
 		LinkedList<String> dates = new LinkedList<String>();
+		
 		try {
 			getDates = conn.prepareStatement(dateQuery);
 			getDates.setString(1, movieName);
@@ -173,8 +174,30 @@ public class Database {
 				dates.add(sqlDates.getString("showDate"));
 			}
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	
+		
+//		ResultSet sqlDates;
+//		PreparedStatement getDates;
+//		
+//		LinkedList<String> dates = new LinkedList<String>();
+//
+//		try{
+//			getDates = conn.prepareStatement(dateQuery);
+//			getDates.setString(1, movie);
+//			sqlDates = getDates.executeQuery();
+//
+//			while(sqlDates.next()){
+//				dates.add(sqlDates.getString("showDate"));
+//			}
+//	
+//		} catch(SQLException e){
+//			e.printStackTrace();
+//		}
+				
 		return dates;
 	}
 
