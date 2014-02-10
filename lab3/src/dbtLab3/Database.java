@@ -24,11 +24,11 @@ public class Database {
 	 */
 	public Database() {
 		conn = null;
-		  userNameQuery = "SELECT name FROM Users WHERE userName = ?";
-		  movieQuery = "SELECT name FROM Movies";
-		  dateQuery = "SELECT showDate FROM Performances WHERE movieName = ?";
-		  performanceQuery = "SELECT freeSeats, theaterName FROM Performances WHERE movieName = ? and showDate = ?";
-		  bookQuery = "insert into Tickets ";
+		userNameQuery = "SELECT name FROM Users WHERE userName = ?";
+		movieQuery = "SELECT name FROM Movies";
+		dateQuery = "SELECT showDate FROM Performances WHERE movieName = ?";
+		performanceQuery = "SELECT freeSeats, theaterName FROM Performances WHERE movieName = ? and showDate = ?";
+		bookQuery = "insert into Tickets ";
 	}
 
 	/**
@@ -87,8 +87,25 @@ public class Database {
 	 * @param userId
 	 * @return true if userId exists in database
 	 */
-	public boolean checkUser(String userId) {
-		return false;
+	public String getUser(String userId) {
+		PreparedStatement getUser;
+		ResultSet sqlUser;
+		try {
+			getUser = conn.prepareStatement(userNameQuery);
+			getUser.setString(1, userId);
+			sqlUser = getUser.executeQuery();
+			while(sqlUser.next()){
+				String userName = sqlUser.getString("name");
+				if (userName != null) {
+					return userName;
+				}
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return null;
 	}
 
 	/**
@@ -96,26 +113,26 @@ public class Database {
 	 * @return list of all movies in database
 	 */
 	public LinkedList<String> getmovies() {
-	
-	ResultSet sqlMovies;
-	PreparedStatement getMovies;
-	
-	LinkedList<String> dates = new LinkedList<String>();
 
-	try{
-		getMovies = conn.prepareStatement(movieQuery);
-		sqlMovies = getMovies.executeQuery();
+		ResultSet sqlMovies;
+		PreparedStatement getMovies;
 
-		while(sqlMovies.next()){
-			dates.add(sqlMovies.getString("name"));
+		LinkedList<String> dates = new LinkedList<String>();
+
+		try {
+			getMovies = conn.prepareStatement(movieQuery);
+			sqlMovies = getMovies.executeQuery();
+
+			while (sqlMovies.next()) {
+				dates.add(sqlMovies.getString("name"));
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
 		}
 
-	} catch(SQLException e){
-		e.printStackTrace();
-	}
-			
-	return dates;
-	
+		return dates;
+
 	}
 
 	/**
@@ -123,53 +140,54 @@ public class Database {
 	 * @param movieName
 	 * @return returns a list of all dates for movie movieName
 	 */
-	public LinkedList<String> getDates(String movie){
+	public LinkedList<String> getDates(String movie) {
 		ResultSet sqlDates;
 		PreparedStatement getDates;
-		
+
 		LinkedList<String> dates = new LinkedList<String>();
 
-		try{
+		try {
 			getDates = conn.prepareStatement(dateQuery);
 			getDates.setString(1, movie);
 			sqlDates = getDates.executeQuery();
 
-			while(sqlDates.next()){
+			while (sqlDates.next()) {
 				dates.add(sqlDates.getString("showDate"));
 			}
-	
-		} catch(SQLException e){
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-				
+
 		return dates;
-		
+
 	}
 
 	public Performance getPerformance(String movieName, String date) {
-		
-		
+
 		return null;
 	}
 
 	/**
 	 * Books a ticket for the performance
+	 * 
 	 * @param performance
 	 */
-	public void bookTicket(String movieName,String date) {
+	public void bookTicket(String movieName, String date) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	public LinkedList<String> getMovieDates(String movieName) {
 		PreparedStatement getDates;
 		ResultSet sqlDates;
 		LinkedList<String> dates = new LinkedList<String>();
+
 		try {
 			getDates = conn.prepareStatement(dateQuery);
 			getDates.setString(1, movieName);
 			sqlDates = getDates.executeQuery();
-			while(sqlDates.next()) {
+			while (sqlDates.next()) {
 				dates.add(sqlDates.getString("showDate"));
 			}
 		} catch (SQLException e) {

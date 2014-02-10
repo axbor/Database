@@ -249,8 +249,10 @@ public class BookingPane extends BasicPane {
 			Performance performance = db.getPerformance(movieName, date);
 			fields[MOVIE_NAME].setText(movieName);
 			fields[PERF_DATE].setText(date);
-			fields[THEATER_NAME].setText(performance.getTheater());
-			fields[FREE_SEATS].setText(String.valueOf(performance.getNbrSeats()));
+			System.out.println(performance == null);
+//			System.out.println(performance.getTheater());
+//			fields[THEATER_NAME].setText(performance.getTheater());
+//			fields[FREE_SEATS].setText(String.valueOf(performance.getNbrSeats()));
 		}
 	}
 
