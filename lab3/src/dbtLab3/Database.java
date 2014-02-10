@@ -152,7 +152,7 @@ public class Database {
 			sqlDates = getDates.executeQuery();
 
 			while (sqlDates.next()) {
-				dates.add(sqlDates.getString("showDate"));
+				dates.add(sqlDates.getDate("showDate").toString());
 			}
 
 		} catch (SQLException e) {
