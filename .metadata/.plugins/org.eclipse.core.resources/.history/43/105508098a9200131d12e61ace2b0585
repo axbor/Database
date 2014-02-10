@@ -168,6 +168,7 @@ public class Database {
 	public Performance getPerformance(String movieName, String date) {
 		PreparedStatement prep;
 		ResultSet rs;
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
 		try {
 			prep = conn.prepareStatement(performanceQuery);
 			prep.setString(1, movieName);

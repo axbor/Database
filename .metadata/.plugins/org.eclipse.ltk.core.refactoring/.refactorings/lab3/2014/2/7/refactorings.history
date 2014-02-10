@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename local variable &apos;perf&apos; in &apos;dbtLab3.Database.getPerformance(...)&apos; to &apos;prep&apos;&#x0A;- Original project: &apos;lab3&apos;&#x0A;- Original element: &apos;dbtLab3.Database.getPerformance(String, String).perf&apos;&#x0A;- Renamed element: &apos;perf&apos;&#x0A;- Update references to refactored element" description="Rename local variable &apos;perf&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src&lt;dbtLab3{Database.java[Database~getPerformance~QString;~QString;@perf!3769!3791!3787!3790!QPreparedStatement;!0!false" name="prep" references="true" stamp="1392059345442" version="1.0"/>
+</session>

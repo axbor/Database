@@ -1,8 +1,6 @@
 package dbtLab3;
 
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 
 /**
@@ -96,7 +94,7 @@ public class Database {
 			getUser = conn.prepareStatement(userNameQuery);
 			getUser.setString(1, userId);
 			sqlUser = getUser.executeQuery();
-			while (sqlUser.next()) {
+			while(sqlUser.next()){
 				String userName = sqlUser.getString("name");
 				if (userName != null) {
 					return userName;
@@ -166,24 +164,7 @@ public class Database {
 	}
 
 	public Performance getPerformance(String movieName, String date) {
-		PreparedStatement prep;
-		ResultSet rs;
-		try {
-			prep = conn.prepareStatement(performanceQuery);
-			prep.setString(1, movieName);
-			prep.setString(2, date);
-			rs = prep.executeQuery();
-			while (rs.next()) {
-				String theaterName = rs.getString("theaterName");
-				String freeSeats = rs.getString("freeSeats");
-				Performance performance = new Performance(movieName,
-						theaterName, Date.valueOf(date),
-						Integer.parseInt(freeSeats));
-				return performance;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+
 		return null;
 	}
 
