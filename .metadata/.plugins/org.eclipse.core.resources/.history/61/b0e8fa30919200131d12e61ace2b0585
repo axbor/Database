@@ -19,7 +19,6 @@ public class Database {
 	private String bookQuery;
 	private String freeSeatsQuery;
 	private String setFreeSeatsQuery;
-
 	/**
 	 * Create the database interface object. Connection to the database is
 	 * performed later.
@@ -33,7 +32,7 @@ public class Database {
 		bookQuery = "INSERT INTO Tickets values(null, ?, ?, ?)";
 		freeSeatsQuery = "SELECT freeSeats FROM performances WHERE movieName = ? and showDate = ?";
 		setFreeSeatsQuery = "UPDATE Performances set freeSeats = ? WHERE movieName = ? and showDate = ?";
-
+		
 	}
 
 	/**
@@ -99,13 +98,14 @@ public class Database {
 			getUser = conn.prepareStatement(userNameQuery);
 			getUser.setString(1, userId);
 			sqlUser = getUser.executeQuery();
-			while (sqlUser.next()) {
+			while(sqlUser.next()){
 				String userName = sqlUser.getString("name");
 				if (userName != null) {
 					return userName;
 				}
 			}
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -168,24 +168,8 @@ public class Database {
 	}
 
 	public Performance getPerformance(String movieName, String date) {
-		PreparedStatement prep;
-		ResultSet rs;
-		try {
-			prep = conn.prepareStatement(performanceQuery);
-			prep.setString(1, movieName);
-			prep.setString(2, date);
-			rs = prep.executeQuery();
-			while (rs.next()) {
-				String theaterName = rs.getString("theaterName");
-				String freeSeats = rs.getString("freeSeats");
-				Performance performance = new Performance(movieName,
-						theaterName, Date.valueOf(date),
-						Integer.parseInt(freeSeats));
-				return performance;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		
+		
 
 		return null;
 	}
@@ -195,52 +179,50 @@ public class Database {
 	 * 
 	 * @param performance
 	 * 
-	 *            bookQuery = "INSERT INTO Tickets values(null, ?, ?, ?)";
-	 *            freeSeatsQuery =
-	 *            "SELECT freeSeats FROM performances WHERE movieName = ? and showDate = ?"
-	 *            ; setFreeSeatsQuery =
-	 *            "UPDATE Performances set freeSeats = ? WHERE movieName = ? and showDate = ?"
-	 *            ;
+	 * 	bookQuery = "INSERT INTO Tickets values(null, ?, ?, ?)";
+	 *  freeSeatsQuery = "SELECT freeSeats FROM performances WHERE movieName = ? and showDate = ?";
+	 *  setFreeSeatsQuery = "UPDATE Performances set freeSeats = ? WHERE movieName = ? and showDate = ?";
 	 */
 	public boolean bookTicket(String owner, String movieName, String date) {
-
+		
+		
 		ResultSet ticket;
 		PreparedStatement bookingQuery;
 		PreparedStatement getFreeSeats;
 		PreparedStatement setFreeSeats;
 		int freeSeats;
-		try {
-
+		try{
+		
 			getFreeSeats = conn.prepareStatement(freeSeatsQuery);
 			getFreeSeats.setString(1, movieName);
 			getFreeSeats.setString(2, date);
-
+			
 			setFreeSeats = conn.prepareStatement(setFreeSeatsQuery);
 			setFreeSeats.setString(2, movieName);
-			setFreeSeats.setString(3, date);
-
-			bookingQuery = conn.prepareStatement(bookQuery);
+			setFreeSeats.setString(3,  date);
+			
+			bookingQuery= conn.prepareStatement(bookQuery);
 			bookingQuery.setString(1, owner);
-			bookingQuery.setString(2, movieName);
+			bookingQuery.setString(2,  movieName);
 			bookingQuery.setString(3, date);
-
+			
 			ticket = getFreeSeats.executeQuery();
 			conn.setAutoCommit(false);
 
 			freeSeats = ticket.getInt(1);
-
-			if (freeSeats < 1) {
+			
+			if(freeSeats < 1){
 				conn.rollback();
 				return false;
 			}
-
-			setFreeSeats.setInt(1, freeSeats - 1);
+			
+			setFreeSeats.setInt(1, freeSeats-1);
 			setFreeSeats.executeQuery();
 			bookingQuery.executeQuery();
 			conn.commit();
 			conn.setAutoCommit(true);
-
-		} catch (SQLException e) {
+		
+		}catch(SQLException e){
 			return false;
 		}
 		return true;

@@ -278,8 +278,8 @@ public class BookingPane extends BasicPane {
 			}
 			String movieName = nameList.getSelectedValue();
 			String date = dateList.getSelectedValue();
-			System.out.println(db.bookTicket(CurrentUser.instance().getCurrentUserId(), movieName,
-					date));
+			db.bookTicket(CurrentUser.instance().getCurrentUserId(), movieName,
+					date);
 		}
 	}
 }
