@@ -225,23 +225,22 @@ public class Database {
 			bookingQuery.setDate(3, Date.valueOf(date));
 
 			ticket = getFreeSeats.executeQuery();
-
 			conn.setAutoCommit(false);
-			ticket.next();
+
 			freeSeats = ticket.getInt(1);
+
 			if (freeSeats < 1) {
 				conn.rollback();
 				return false;
 			}
 
 			setFreeSeats.setInt(1, freeSeats - 1);
-			setFreeSeats.executeUpdate();
-			bookingQuery.executeUpdate();
+			setFreeSeats.executeQuery();
+			bookingQuery.executeQuery();
 			conn.commit();
 			conn.setAutoCommit(true);
 
 		} catch (SQLException e) {
-			System.err.println(e);
 			return false;
 		}
 		return true;

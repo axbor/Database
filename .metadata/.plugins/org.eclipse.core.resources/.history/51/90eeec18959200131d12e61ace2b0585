@@ -85,7 +85,7 @@ public class UserLoginPane extends BasicPane {
 			String name = db.getUser(userId);
 			CurrentUser current = CurrentUser.instance();
 			if(name != null){
-				current.loginAs(userId);
+				current.loginAs(name);
 			}else{
 				current.loginAs("<none>");
 			}

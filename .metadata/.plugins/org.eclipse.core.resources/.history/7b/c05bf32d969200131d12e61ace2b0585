@@ -281,8 +281,6 @@ public class BookingPane extends BasicPane {
 			if(db.bookTicket(CurrentUser.instance().getCurrentUserId(), movieName,
 					date)) {
 				JOptionPane.showMessageDialog(new JFrame("Hej"),"Du har nu bokat en biljett");
-			}else {
-				JOptionPane.showMessageDialog(new JFrame("Hej"),"Du får inte titta på bio!!!!!");
 			}
 		}
 	}

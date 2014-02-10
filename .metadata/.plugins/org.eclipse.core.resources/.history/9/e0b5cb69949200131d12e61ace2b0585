@@ -214,29 +214,38 @@ public class Database {
 			getFreeSeats = conn.prepareStatement(freeSeatsQuery);
 			getFreeSeats.setString(1, movieName);
 			getFreeSeats.setDate(2, Date.valueOf(date));
+			System.out.println("1");
 
 			setFreeSeats = conn.prepareStatement(setFreeSeatsQuery);
 			setFreeSeats.setString(2, movieName);
 			setFreeSeats.setDate(3, Date.valueOf(date));
+			System.out.println("2");
 
 			bookingQuery = conn.prepareStatement(bookQuery);
 			bookingQuery.setString(1, owner);
 			bookingQuery.setString(2, movieName);
 			bookingQuery.setDate(3, Date.valueOf(date));
-
+			System.out.println("3");
+			
 			ticket = getFreeSeats.executeQuery();
+			System.out.println("4");
 
 			conn.setAutoCommit(false);
-			ticket.next();
+			System.out.println("5");
+
+			System.out.println(ticket.getInt(1));
 			freeSeats = ticket.getInt(1);
+			System.out.println("6");
+
+			System.out.println(freeSeats);
 			if (freeSeats < 1) {
 				conn.rollback();
 				return false;
 			}
 
 			setFreeSeats.setInt(1, freeSeats - 1);
-			setFreeSeats.executeUpdate();
-			bookingQuery.executeUpdate();
+			setFreeSeats.executeQuery();
+			bookingQuery.executeQuery();
 			conn.commit();
 			conn.setAutoCommit(true);
 

@@ -223,20 +223,23 @@ public class Database {
 			bookingQuery.setString(1, owner);
 			bookingQuery.setString(2, movieName);
 			bookingQuery.setDate(3, Date.valueOf(date));
-
+			
 			ticket = getFreeSeats.executeQuery();
 
 			conn.setAutoCommit(false);
 			ticket.next();
 			freeSeats = ticket.getInt(1);
+			System.out.println("6");
+
+			System.out.println(freeSeats);
 			if (freeSeats < 1) {
 				conn.rollback();
 				return false;
 			}
 
 			setFreeSeats.setInt(1, freeSeats - 1);
-			setFreeSeats.executeUpdate();
-			bookingQuery.executeUpdate();
+			setFreeSeats.executeQuery();
+			bookingQuery.executeQuery();
 			conn.commit();
 			conn.setAutoCommit(true);
 
