@@ -55,7 +55,7 @@ create table RawMaterial (
 	ingredientName varchar(20),
 	amount int, 
 	lastDeliveryDate date, 
-	lastDeliveryAmount date, 
+	lastDeliveryAmount int, 
 	primary key(ingredientName)
 );
 
