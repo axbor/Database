@@ -1,0 +1,77 @@
+
+create table Customer (
+	customerName varchar(50),
+	address varchar(50),
+	primary key(customerName)
+);
+
+create table Order (
+	orderNumber int,
+	customerName varchar(50),
+	orderDate date,
+	deliveryDate date,
+	primary key(orderNumber),
+	foreign key(customerName) references Customer(customerName)
+);
+
+
+create table Recipe(
+	cookieName varchar(20),
+	primary key(cookieName)
+);
+
+create table Shipment (
+	shipmentNumber int,
+	primary key(shipmentNumber)
+);
+
+create table Pallet(
+	palletNumer int,
+	shipmentNumber int,
+	status varchar(20),
+	primary key(palletNumber),
+	foreign key(shipmentNumber) references Pallet(palletNumber)
+);
+
+create table ProductionBatch(
+	batchNumber int, 
+	cookieName varchar(20), 
+	prodDate date, 
+	QA varchar(20),
+	primarykey(batchNumber)
+	foreign key(cookieName) references Recipe(cookieName)
+);
+
+create table batchesInPallet(
+	palletNumber int,
+	batchNumber int,
+	primary key(palletNumber, batchNumber),
+	foreign key(palletNumber) references Pallet(palletNumber),
+	foreign key(batchNumber) references ProductionBatch(batchNumber)
+);
+
+create table OrdersInShipment (
+	orderNumber int, 
+	shipmentNumber int, 
+	primary key(orderNumber, shipmentNumber),
+	foreign key(orderNumber) references Recipe(orderNumber),
+	foreign key(shipmentNumber) references Shipment(shipmentNumber) 
+);
+
+create table PalletOrder (
+	orderNumber int,
+	cookieName varchar(20),
+	amount int,
+	primary key(orderNumber, cookieName),
+	foreign key(orderNumber) references Order(orderNumber),
+	foreign key(cookieName) references Recipe(cookieName)
+);
+
+create table CookieContains (
+	cookieName varchar(20),
+	ingredientName varchar(20),
+	amount int,
+	primary key(cookieName, ingredientName),
+	foreign key(cookieName) references Recipe(cookieName),
+	foreign key(ingredientName) references RawMaterial(ingredientName)
+);
