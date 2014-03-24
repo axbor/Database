@@ -1,0 +1,9 @@
+!SESSION 2014-03-24 17:10:43.873 -----------------------------------------------
+eclipse.buildId=I20110613-1736
+java.version=1.7.0_51
+java.vendor=Oracle Corporation
+BootLoader constants: OS=linux, ARCH=x86_64, WS=gtk, NL=en_US
+Command-line arguments:  -data /home/axel/Documents/School/EDA216-Database/Database/Cookies -os linux -ws gtk -arch x86_64
+
+!ENTRY org.eclipse.mylyn.tasks.ui 2 0 2014-03-24 17:10:58.371
+!MESSAGE No search provider was registed. Tasks search is not available.
