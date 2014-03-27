@@ -10,10 +10,14 @@ public class BackEnd {
 
 
 	private Connection conn;
-
+	private String createPalletQuery;
+	private String getNbrOfBatchesQuery;
 
 	public BackEnd(){
 		conn = null;
+		
+		createPalletQuery = "Insert into Pallets values (null,?,created)";
+		getNbrOfBatchesQuery = "select ";
 		
 	}
 	
@@ -84,10 +88,15 @@ public class BackEnd {
 		return;
 	}
 	
-	public void createPallets(String recipe, int nbrOfPallets){
-
+	public void createPallet(String recipe, int nbrOfPallets){
+		int nbrOfBatches = nbrOfBatches(recipe);
 	
 		return;
+	}
+
+	private int nbrOfBatches(String recipe) {
+		
+		return 0;
 	}
 }
 		

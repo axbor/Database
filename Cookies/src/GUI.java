@@ -21,9 +21,6 @@ public class GUI {
 	 * tabbedPane is the contents of the window. It consists of two panes, User
 	 * login and Book tickets.
 	 */
-	private JTabbedPane tabbedPane;
-	private JTextField txtText;
-	private JList<String> cookieList;
 	private JTextField cookieAmountField;
 	private int amount;
 	private JList<String> list;
@@ -39,11 +36,12 @@ public class GUI {
 	 *            The database.
 	 * @wbp.parser.entryPoint
 	 */
-	public GUI(Database db) {
+	public GUI(final BackEnd be) {
+		
 		JFrame frame = new JFrame("Cookies");	
 		frame.setSize(500,500);
 		
-		//create Tab
+		//create Tab /////////////////////////
 		
 		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
 		frame.getContentPane().add(tabbedPane_1, BorderLayout.CENTER);
@@ -76,7 +74,7 @@ public class GUI {
 						ListModel<String> model = list.getModel();
 						String cookie = model.getElementAt(index);
 						cookieAmountField.setText(cookie);
-//						db.createPallet(cookie, amount);
+						be.createPallet(cookie, amount);
 					}
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
