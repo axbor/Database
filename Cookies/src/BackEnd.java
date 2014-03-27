@@ -1,6 +1,4 @@
 
-
-package KrustyKookies;
 import java.sql.*;
 import java.util.Vector;
 

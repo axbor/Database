@@ -1,4 +1,3 @@
-package KrustyKookies;
 import java.util.Vector;
 
 
@@ -12,15 +11,15 @@ public class main {
 		new GUI(db);
 
 
-		BackEnd be = new BackEnd();
-
-		be.openConnection();
-
-		Vector<String> list = be.getRecipes();
-
-		for(String recipe : list){
-			System.out.println(recipe);
-		}
+//		BackEnd be = new BackEnd();
+//
+//		be.openConnection();
+//
+//		Vector<String> list = be.getRecipes();
+//
+//		for(String recipe : list){
+//			System.out.println(recipe);
+//		}
 	}
 
 }

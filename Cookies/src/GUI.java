@@ -1,8 +1,11 @@
-import javax.swing.*;
-import javax.swing.event.*;
-
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.xml.stream.Location;
 
 /**
  * MovieGUI is the user interface to the movie database. It sets up the main
@@ -19,75 +22,260 @@ public class GUI {
 	 * login and Book tickets.
 	 */
 	private JTabbedPane tabbedPane;
+	private JTextField txtText;
+	private JList<String> cookieList;
+	private JTextField cookieAmountField;
+	private int amount;
+	private JList<String> list;
+	private JTextField palletNumberField;
+	private JTextField palletInfoField;
+	private JTextField batchNumberField;
+	private JTextField batchInfoField;
 
 	/**
 	 * Create a GUI object and connect to the database.
 	 * 
 	 * @param db
 	 *            The database.
+	 * @wbp.parser.entryPoint
 	 */
 	public GUI(Database db) {
-		JFrame frame = new JFrame("Cookies");
-		tabbedPane = new JTabbedPane();
+		JFrame frame = new JFrame("Cookies");	
+		frame.setSize(500,500);
 		
-		CreatingPane creatingPane = new CreatingPane(db);
-//		tabbedPane.addTab("create", null, creatingPane, "create Cookie");
-		tabbedPane.addTab("create", null, creatingPane, "Create Cookie");
+		//create Tab
 		
-		frame.setSize(500,400);
+		JTabbedPane tabbedPane_1 = new JTabbedPane(JTabbedPane.TOP);
+		frame.getContentPane().add(tabbedPane_1, BorderLayout.CENTER);
+		
+		JPanel createPanel = new JPanel();
+		tabbedPane_1.addTab("Create", null, createPanel, null);
+		createPanel.setLayout(null);
+				
+		list = new JList<String>();
+		list.setModel(new CookieListModel(db));
+		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		createPanel.add(list);
+		list.setBounds(50, 94, 150, 200);
+		
+		cookieAmountField = new JTextField();
+		cookieAmountField.setBounds(284, 106, 144, 62);
+		createPanel.add(cookieAmountField);
+		cookieAmountField.setColumns(10);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = cookieAmountField.getText();
+				try{
+					amount = Integer.parseInt(text);
+					if(amount < 1) {
+						JOptionPane.showMessageDialog(null, "Amount has to be bigger than 0");
+					}else {
+						int index = list.getSelectedIndex();
+						ListModel<String> model = list.getModel();
+						String cookie = model.getElementAt(index);
+						cookieAmountField.setText(cookie);
+//						db.createPallet(cookie, amount);
+					}
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
+				}
+			}
+		});
+		btnOk.setBounds(284, 291, 117, 25);
+		createPanel.add(btnOk);
+		
+		JLabel lblAmountOfPallets = new JLabel("Amount of Pallets");
+		lblAmountOfPallets.setBounds(284, 79, 136, 15);
+		createPanel.add(lblAmountOfPallets);
+		
+		JLabel lblChooseACookie = new JLabel("Choose a cookie type to create");
+		lblChooseACookie.setBounds(33, 51, 221, 15);
+		createPanel.add(lblChooseACookie);
+
+		//Search Pallet tab////////////////////////////
+		
+		JPanel searchPalletPanel = new JPanel();
+		tabbedPane_1.addTab("Search Pallet", null, searchPalletPanel, null);
+		searchPalletPanel.setLayout(null);
+		
+		palletNumberField = new JTextField();
+		palletNumberField.setBounds(125, 106, 213, 82);
+		searchPalletPanel.add(palletNumberField);
+		palletNumberField.setColumns(10);
+		
+		JLabel lblWritePalletNumber = new JLabel("Write pallet number of the pallet you want to search for");
+		lblWritePalletNumber.setBounds(55, 68, 428, 15);
+		searchPalletPanel.add(lblWritePalletNumber);
+		
+		JButton btnOk_1 = new JButton("Ok");
+		btnOk_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String pallet = palletNumberField.getText();
+				try{
+					int palletNbr = Integer.parseInt(pallet);
+					if(palletNbr < 1) {
+						JOptionPane.showMessageDialog(null, "The pallet number has to be bigger than 0");
+					}else {
+//						String info = db.getPalletInfo(palletNbr);
+//						palletInfoField.setText(info);
+						palletInfoField.setText("hej");
+					}
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "The pallet number is an integer bigger than 0");
+				}
+			}
+		});
+		btnOk_1.setBounds(172, 200, 117, 25);
+		searchPalletPanel.add(btnOk_1);
+		
+		palletInfoField = new JTextField();
+		palletInfoField.setEditable(false);
+		palletInfoField.setBounds(55, 279, 386, 131);
+		searchPalletPanel.add(palletInfoField);
+		palletInfoField.setColumns(10);
+		
+		//Hämta info från pallen
+		
+		
+		JLabel lblInfo = new JLabel("Info");
+		lblInfo.setBounds(56, 233, 70, 15);
+		searchPalletPanel.add(lblInfo);
+		
+		
+
+		//Search Batch tab////////////////////////////
+		
+		JPanel searchBatchPanel = new JPanel();
+		tabbedPane_1.addTab("Search Batch", null, searchBatchPanel, null);
+		searchBatchPanel.setLayout(null);
+		
+		batchNumberField = new JTextField();
+		batchNumberField.setBounds(125, 106, 213, 82);
+		searchBatchPanel.add(batchNumberField);
+		batchNumberField.setColumns(10);
+		
+		JLabel lblWriteBatchNumber = new JLabel("Write batch number of the batch you want to search for");
+		lblWriteBatchNumber.setBounds(55, 68, 428, 15);
+		searchBatchPanel.add(lblWriteBatchNumber);
+		
+		JButton btnOk_2 = new JButton("Ok");
+		btnOk_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String batch = palletNumberField.getText();
+				try{
+					int batchNbr = Integer.parseInt(batch);
+					if(batchNbr < 1) {
+						JOptionPane.showMessageDialog(null, "The batch number has to be bigger than 0");
+					}else {
+//						String info = db.getBatchInfo(batchNbr);
+//						palletInfoField.setText(info);
+						palletInfoField.setText("hej");
+					}
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "The batch number is an integer bigger than 0");
+				}
+			}
+		});
+		btnOk_2.setBounds(172, 200, 117, 25);
+		searchBatchPanel.add(btnOk_2);
+		
+		batchInfoField = new JTextField();
+		batchInfoField.setEditable(false);
+		batchInfoField.setBounds(55, 279, 386, 131);
+		searchBatchPanel.add(batchInfoField);
+		batchInfoField.setColumns(10);
+		
+		//Hämta info från batchen
+		
+		
+		JLabel lblBatchInfo = new JLabel("Info");
+		lblBatchInfo.setBounds(56, 233, 70, 15);
+		searchBatchPanel.add(lblBatchInfo);
+		
+		
+		
+		
+		//blocking panel /////////////////////////////////
+		
+		
+		JPanel blockingPanel = new JPanel();
+		tabbedPane_1.addTab("Blocking", null, blockingPanel, null);
+		blockingPanel.setLayout(null);
+		
+		final JList blockList = new JList();
+		blockList.setBounds(45, 47, 256, 385);
+		blockList.setModel(new BlockingListModel(db));
+		blockList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		blockingPanel.add(blockList);
+		
+		JButton btnBlock = new JButton("Block");
+		btnBlock.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+						int index = blockList.getSelectedIndex();
+						ListModel<String> model = blockList.getModel();
+						int batch= Integer.parseInt(model.getElementAt(index));
+//						db.blockBatch(batch);
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "The batch number is an integer bigger than 0");
+				}
+			}
+		});
+		btnBlock.setBounds(398, 228, 71, 25);
+		blockingPanel.add(btnBlock);
+		
+		
+		
+		JLabel lblNewLabel = new JLabel("Block Batch");
+		lblNewLabel.setBounds(45, 12, 101, 15);
+		blockingPanel.add(lblNewLabel);
+		
+
+		
 		frame.setVisible(true);
 	}
+	
+	class CookieListModel extends AbstractListModel<String> {
+		private ArrayList<String> cookies = new ArrayList<String>();
+		
+	    public CookieListModel(Database db){
+//	    	cookies = db.getCookies();
+	        cookies.add("banankaka");
+	        cookies.add("sockarkaka");
+	        cookies.add("pepparkaka");
+	        }
 
-	class WindowHandler extends WindowAdapter {
-		/**
-		 * Called when the user exits the application. Closes the connection to
-		 * the database.
-		 * 
-		 * @param e
-		 *            The window event (not used).
-		 */
-		public void windowClosing(WindowEvent e) {
-			db.closeConnection();
-			System.exit(0);
-		}
+	        @Override
+	        public int getSize() {
+	        return cookies.size();
+	        }
+
+	        @Override
+	        public String getElementAt(int index) {
+	        return cookies.get(index);
+	        }
 	}
-	//		tabbedPane.addTab("User login", null, userLoginPane,
-	//				"Log in as a new user");
-	//
-	//		BookingPane bookingPane = new BookingPane(db);
-	//		tabbedPane.addTab("Book ticket", null, bookingPane, "Book a ticket");
-	//
-	//		tabbedPane.setSelectedIndex(0);
-	//
-	//		frame.getContentPane().add(tabbedPane, BorderLayout.CENTER);
-	//
-	//		tabbedPane.addChangeListener(new ChangeHandler());
-	//		frame.addWindowListener(new WindowHandler());
+	
+	class BlockingListModel extends AbstractListModel<String> {
+		private ArrayList<String> blocking = new ArrayList<String>();
+		
+	    public BlockingListModel(Database db){
+//	    	blocking = db.getBatches();
+	        blocking.add("1");
+	        blocking.add("2");
+	        blocking.add("3");
+	        }
 
-	//		userLoginPane.displayMessage("Connecting to database ...");
-	//	
-	//
-	//	/**
-	//	 * ChangeHandler is a listener class, called when the user switches panes.
-	//	 */
-	//	class ChangeHandler implements ChangeListener {
-	//		/**
-	//		 * Called when the user switches panes. The entry actions of the new
-	//		 * pane are performed.
-	//		 * 
-	//		 * @param e
-	//		 *            The change event (not used).
-	//		 */
-	//		public void stateChanged(ChangeEvent e) {
-	//			BasicPane selectedPane = (BasicPane) tabbedPane
-	//					.getSelectedComponent();
-	//			selectedPane.entryActions();
-	//		}
-	//	}
-	//
-	//	/**
-	//	 * WindowHandler is a listener class, called when the user exits the
-	//	 * application.
-	//	 */
-	//	
+	        @Override
+	        public int getSize() {
+	        return blocking.size();
+	        }
+
+	        @Override
+	        public String getElementAt(int index) {
+	        return blocking.get(index);
+	        }
+	}
 }
