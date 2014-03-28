@@ -193,6 +193,9 @@ public class BackEnd {
 		PreparedStatement getBatchInfo;
 		ResultSet batchInfoSet;
 		StringBuilder sb = new StringBuilder();
+		if(!batchExist(batchNbr)) {
+			return null;
+		}
 		try {
 			getBatchInfo = conn.prepareStatement(getBatchInfoQuery);
 			getBatchInfo.setInt(1, batchNbr);
@@ -230,10 +233,33 @@ public class BackEnd {
 
 	public boolean blockBatch(int batchNbr) {
 		PreparedStatement blockBatches;
-//		ResultSet
-		
-		// TODO Auto-generated method stub
-		return false;
+		if(!batchExist(batchNbr)) {
+			return false;
+		}
+		try {
+			blockBatches = conn.prepareStatement(blockBatchQuery);
+			blockBatches.setInt(1, batchNbr);
+			blockBatches.executeQuery();
+		}catch(SQLException e) {
+			System.err.println(e);
+		}
+		return true;
+	}
+
+	private boolean batchExist(int batchNbr) {
+		PreparedStatement checkBatches;
+		ResultSet checkBatchSet;
+		try {
+			checkBatches = conn.prepareStatement(getBatchInfoQuery);
+			checkBatches.setInt(1, batchNbr);
+			checkBatchSet = checkBatches.executeQuery();
+			if(!checkBatchSet.next()){
+				return false;
+			}
+		}catch(SQLException e) {
+			System.err.println(e);
+		}
+		return true;
 	}
 
 	public ArrayList<String> getBatches() {

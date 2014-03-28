@@ -218,7 +218,9 @@ public class GUI {
 					ListModel<String> model = blockList.getModel();
 					int batchNbr= Integer.parseInt(model.getElementAt(index));
 					//TODO: implementera den nadanför
-					be.blockBatch(batchNbr);
+					if(!be.blockBatch(batchNbr)) {
+						JOptionPane.showMessageDialog(null, "A batch with that number does not exist");
+					}
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "The batch number is an integer bigger than 0");
 				}
