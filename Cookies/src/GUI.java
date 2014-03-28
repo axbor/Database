@@ -23,10 +23,13 @@ public class GUI {
 	private JTextField cookieAmountField;
 	private int amount;
 	private JList<String> list;
-	private JTextField batchNumberField;
-	private JTextField batchInfoField;
 	private JTextField textField;
 	private JTextField textField_1;
+	private JTextField textField_2;
+	private JTextField textField_3;
+	private JTable table;
+	private JTable table_1;
+	private JTable table_2;
 
 	/**
 	 * Create a GUI object and connect to the database.
@@ -38,7 +41,7 @@ public class GUI {
 	public GUI(BackEnd b) {
 		final BackEnd be = b;
 		JFrame frame = new JFrame("Cookies");	
-		frame.setSize(500,500);
+		frame.setSize(700,500);
 
 		//create Tab /////////////////////////
 
@@ -92,25 +95,83 @@ public class GUI {
 		lblChooseACookie.setBounds(33, 51, 221, 15);
 		createPanel.add(lblChooseACookie);
 		
+		
+		//search Tab /////////////////////////
+		
 		JTabbedPane searchPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.addTab("Search", null, searchPane, null);
+		//search cookie Tab /////////////////////////
 		
 		JPanel searchCookiePanel = new JPanel();
 		searchPane.addTab("By cookie", null, searchCookiePanel, null);
 		searchCookiePanel.setLayout(null);
 		
+		JList<String> cookieList = new JList<String>();
+		cookieList.setModel(new CookieListModel(be));
+		cookieList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		cookieList.setBounds(12, 12, 148, 364);
+		searchCookiePanel.add(cookieList);
+		
+		
+		JButton btnOk_1 = new JButton("OK");
+		btnOk_1.setBounds(172, 189, 117, 25);
+		searchCookiePanel.add(btnOk_1);
+		
+		table = new JTable();
+		table.setBounds(313, 30, 327, 346);
+		searchCookiePanel.add(table);
+		
+		//search status Tab /////////////////////////
+		
 		JPanel searchStatuspanel = new JPanel();
 		searchPane.addTab("By status", null, searchStatuspanel, null);
+		searchStatuspanel.setLayout(null);
+		
+		JList<String> statusList = new JList<String>();
+		statusList.setModel(new StatusListModel(be));
+		statusList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		statusList.setBounds(12, 49, 148, 364);
+		searchStatuspanel.add(statusList);
+		
+		JButton button_3 = new JButton("OK");
+		button_3.setBounds(172, 226, 117, 25);
+		searchStatuspanel.add(button_3);
+		
+		table_2 = new JTable();
+		table_2.setBounds(313, 67, 327, 346);
+		searchStatuspanel.add(table_2);
+		
+		//search delivery Tab /////////////////////////
 		
 		JPanel searchDeliverypanel = new JPanel();
 		searchPane.addTab("By delivery", null, searchDeliverypanel, null);
+		searchDeliverypanel.setLayout(null);
+		
+		JList<String> deliveryList = new JList<String>();
+		deliveryList.setModel(new DeliveryListModel(be));
+		deliveryList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		deliveryList.setBounds(12, 40, 148, 364);
+		searchDeliverypanel.add(deliveryList);
+		
+		JButton button_2 = new JButton("OK");
+		button_2.setBounds(172, 217, 117, 25);
+		searchDeliverypanel.add(button_2);
+		
+		table_1 = new JTable();
+		table_1.setBounds(313, 58, 327, 346);
+		searchDeliverypanel.add(table_1);
+		
+		//search time Tab /////////////////////////
 		
 		JPanel searchTimepanel = new JPanel();
 		searchPane.addTab("By time", null, searchTimepanel, null);
 		
+		
+		
+		//search pallet Tab /////////////////////////
 		JPanel searchPalletpanel = new JPanel();
 		searchPalletpanel.setLayout(null);
-		searchPane.addTab("New tab", null, searchPalletpanel, null);
+		searchPane.addTab("By pallet number", null, searchPalletpanel, null);
 		
 		textField = new JTextField();
 		textField.setColumns(10);
@@ -134,58 +195,35 @@ public class GUI {
 		JLabel label_1 = new JLabel("Info");
 		label_1.setBounds(56, 233, 70, 15);
 		searchPalletpanel.add(label_1);
-
-
-
-		//Search Batch tab////////////////////////////
-
-		JPanel searchBatchPanel = new JPanel();
-		tabbedPane_1.addTab("Search by batch number", null, searchBatchPanel, null);
-		searchBatchPanel.setLayout(null);
-
-		batchNumberField = new JTextField();
-		batchNumberField.setBounds(125, 106, 213, 82);
-		searchBatchPanel.add(batchNumberField);
-		batchNumberField.setColumns(10);
-
-		JLabel lblWriteBatchNumber = new JLabel("Write batch number of the batch you want to search for");
-		lblWriteBatchNumber.setBounds(55, 68, 428, 15);
-		searchBatchPanel.add(lblWriteBatchNumber);
-
-		JButton btnOk_2 = new JButton("Ok");
-		btnOk_2.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String batch = palletNumberField.getText();
-				try{
-					int batchNbr = Integer.parseInt(batch);
-					if(batchNbr < 1) {
-						JOptionPane.showMessageDialog(null, "The batch number has to be bigger than 0");
-					}else {
-						//TODO: implementera den nadanför
-						String info = be.getBatchInfo(batchNbr);
-						palletInfoField.setText(info);
-						//						palletInfoField.setText("hej");
-					}
-				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "The batch number is an integer bigger than 0");
-				}
-			}
-		});
-		btnOk_2.setBounds(172, 200, 117, 25);
-		searchBatchPanel.add(btnOk_2);
-
-		batchInfoField = new JTextField();
-		batchInfoField.setEditable(false);
-		batchInfoField.setBounds(55, 279, 386, 131);
-		searchBatchPanel.add(batchInfoField);
-		batchInfoField.setColumns(10);
-
-		//Hämta info från batchen
-
-
-		JLabel lblBatchInfo = new JLabel("Info");
-		lblBatchInfo.setBounds(56, 233, 70, 15);
-		searchBatchPanel.add(lblBatchInfo);
+		
+		
+		//search batch Tab /////////////////////////
+		JPanel searchBatchpanel = new JPanel();
+		searchBatchpanel.setLayout(null);
+		searchPane.addTab("By batch number", null, searchBatchpanel, null);
+		
+		textField_2 = new JTextField();
+		textField_2.setColumns(10);
+		textField_2.setBounds(125, 106, 213, 82);
+		searchBatchpanel.add(textField_2);
+		
+		JLabel label_2 = new JLabel("Write batch number of the batch you want to search for");
+		label_2.setBounds(55, 68, 428, 15);
+		searchBatchpanel.add(label_2);
+		
+		JButton button_1 = new JButton("Ok");
+		button_1.setBounds(172, 200, 117, 25);
+		searchBatchpanel.add(button_1);
+		
+		textField_3 = new JTextField();
+		textField_3.setEditable(false);
+		textField_3.setColumns(10);
+		textField_3.setBounds(55, 279, 386, 131);
+		searchBatchpanel.add(textField_3);
+		
+		JLabel label_3 = new JLabel("Info");
+		label_3.setBounds(56, 233, 70, 15);
+		searchBatchpanel.add(label_3);
 
 
 
@@ -210,7 +248,7 @@ public class GUI {
 					int index = blockList.getSelectedIndex();
 					ListModel<String> model = blockList.getModel();
 					int batchNbr= Integer.parseInt(model.getElementAt(index));
-					//TODO: implementera den nadanför
+					//TODO: implementera den nedanför
 					if(!be.blockBatch(batchNbr)) {
 						JOptionPane.showMessageDialog(null, "A batch with that number does not exist");
 					}
@@ -254,9 +292,6 @@ public class GUI {
 
 		public BlockingListModel(BackEnd be){
 			blocking = be.getBatches();
-//			blocking.add("1");
-//			blocking.add("2");
-//			blocking.add("3");
 		}
 
 		@Override
@@ -267,6 +302,46 @@ public class GUI {
 		@Override
 		public String getElementAt(int index) {
 			return blocking.get(index);
+		}
+	}
+	
+	class DeliveryListModel extends AbstractListModel<String> {
+		private ArrayList<String> delivery = new ArrayList<String>();
+
+		public DeliveryListModel(BackEnd be){
+			//TODO: implementera nedan
+//			delivery = be.getDeliveries();
+			delivery.add("skicakd");
+		}
+
+		@Override
+		public int getSize() {
+			return delivery.size();
+		}
+
+		@Override
+		public String getElementAt(int index) {
+			return delivery.get(index);
+		}
+	}
+	
+	class StatusListModel extends AbstractListModel<String> {
+		private ArrayList<String> statuses = new ArrayList<String>();
+
+		public StatusListModel(BackEnd be){
+			//TODO: implementera nedan
+//			statuses = be.getStatuses();
+			statuses.add("mår bra");
+		}
+
+		@Override
+		public int getSize() {
+			return statuses.size();
+		}
+
+		@Override
+		public String getElementAt(int index) {
+			return statuses.get(index);
 		}
 	}
 }
