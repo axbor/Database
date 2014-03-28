@@ -245,17 +245,12 @@ public class GUI {
 
 		public CookieListModel(BackEnd be){
 			cookies = be.getCookies();
-//			cookies.add("banankaka");
-//			cookies.add("sockarkaka");
-//			cookies.add("pepparkaka");
 		}
 
-		@Override
 		public int getSize() {
 			return cookies.size();
 		}
 
-		@Override
 		public String getElementAt(int index) {
 			return cookies.get(index);
 		}

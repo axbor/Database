@@ -182,7 +182,7 @@ public class BackEnd {
 	}
 	
 	public void createPallet(String recipe, int nbrOfPallets){
-		int nbrOfBatches = nbrOfBatches(recipe);
+		//int nbrOfBatches = nbrOfBatches(recipe);
 	
 		return;
 	}

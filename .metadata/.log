@@ -18717,3 +18717,6 @@ java.library.path = /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
 
 !ENTRY org.eclipse.mylyn.tasks.ui 2 0 2014-03-28 09:12:04.813
 !MESSAGE Repository link provider took over 5000 ms to execute and was timed out: "[org.tigris.subversion.subclipse.mylyn.SubclipseTaskRepositoryLinkProvider@1e93b988]"
+
+!ENTRY org.eclipse.ui 4 4 2014-03-28 11:41:44.630
+!MESSAGE Invalid preference page path: XML Syntax
