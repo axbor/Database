@@ -23,10 +23,10 @@ public class GUI {
 	private JTextField cookieAmountField;
 	private int amount;
 	private JList<String> list;
-	private JTextField palletNumberField;
-	private JTextField palletInfoField;
 	private JTextField batchNumberField;
 	private JTextField batchInfoField;
+	private JTextField textField;
+	private JTextField textField_1;
 
 	/**
 	 * Create a GUI object and connect to the database.
@@ -72,9 +72,9 @@ public class GUI {
 						int index = list.getSelectedIndex();
 						ListModel<String> model = list.getModel();
 						String cookie = model.getElementAt(index);
-						cookieAmountField.setText(cookie);
-						//TODO: implementera den nedanför
-						be.createPallet(cookie, amount);
+						int palletNbr = be.createBatch(cookie, amount);
+						JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
+						palletNbr + " - " + (palletNbr+amount));
 					}
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
@@ -84,70 +84,63 @@ public class GUI {
 		btnOk.setBounds(284, 291, 117, 25);
 		createPanel.add(btnOk);
 
-		JLabel lblAmountOfPallets = new JLabel("Amount of Pallets");
+		JLabel lblAmountOfPallets = new JLabel("Amount of pallets you want to create of selected cookie");
 		lblAmountOfPallets.setBounds(284, 79, 136, 15);
 		createPanel.add(lblAmountOfPallets);
 
 		JLabel lblChooseACookie = new JLabel("Choose a cookie type to create");
 		lblChooseACookie.setBounds(33, 51, 221, 15);
 		createPanel.add(lblChooseACookie);
-
-		//Search Pallet tab////////////////////////////
-
-		JPanel searchPalletPanel = new JPanel();
-		tabbedPane_1.addTab("Search Pallet", null, searchPalletPanel, null);
-		searchPalletPanel.setLayout(null);
-
-		palletNumberField = new JTextField();
-		palletNumberField.setBounds(125, 106, 213, 82);
-		searchPalletPanel.add(palletNumberField);
-		palletNumberField.setColumns(10);
-
-		JLabel lblWritePalletNumber = new JLabel("Write pallet number of the pallet you want to search for");
-		lblWritePalletNumber.setBounds(55, 68, 428, 15);
-		searchPalletPanel.add(lblWritePalletNumber);
-
-		JButton btnOk_1 = new JButton("Ok");
-		btnOk_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String pallet = palletNumberField.getText();
-				try{
-					int palletNbr = Integer.parseInt(pallet);
-					if(palletNbr < 1) {
-						JOptionPane.showMessageDialog(null, "The pallet number has to be bigger than 0");
-					}else {
-						//TODO: implementera den nadanför
-						String info = be.getPalletInfo(palletNbr);
-						//						palletInfoField.setText(info);
-						palletInfoField.setText("hej");
-					}
-				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "The pallet number is an integer bigger than 0");
-				}
-			}
-		});
-		btnOk_1.setBounds(172, 200, 117, 25);
-		searchPalletPanel.add(btnOk_1);
-
-		palletInfoField = new JTextField();
-		palletInfoField.setEditable(false);
-		palletInfoField.setBounds(55, 279, 386, 131);
-		searchPalletPanel.add(palletInfoField);
-		palletInfoField.setColumns(10);
-
-		//Hämta info från pallen
-
-
-		JLabel lblInfo = new JLabel("Info");
-		lblInfo.setBounds(56, 233, 70, 15);
-		searchPalletPanel.add(lblInfo);
+		
+		JTabbedPane searchPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane_1.addTab("Search", null, searchPane, null);
+		
+		JPanel searchCookiePanel = new JPanel();
+		searchPane.addTab("By cookie", null, searchCookiePanel, null);
+		searchCookiePanel.setLayout(null);
+		
+		JPanel searchStatuspanel = new JPanel();
+		searchPane.addTab("By status", null, searchStatuspanel, null);
+		
+		JPanel searchDeliverypanel = new JPanel();
+		searchPane.addTab("By delivery", null, searchDeliverypanel, null);
+		
+		JPanel searchTimepanel = new JPanel();
+		searchPane.addTab("By time", null, searchTimepanel, null);
+		
+		JPanel searchPalletpanel = new JPanel();
+		searchPalletpanel.setLayout(null);
+		searchPane.addTab("New tab", null, searchPalletpanel, null);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(125, 106, 213, 82);
+		searchPalletpanel.add(textField);
+		
+		JLabel label = new JLabel("Write pallet number of the pallet you want to search for");
+		label.setBounds(55, 68, 428, 15);
+		searchPalletpanel.add(label);
+		
+		JButton button = new JButton("Ok");
+		button.setBounds(172, 200, 117, 25);
+		searchPalletpanel.add(button);
+		
+		textField_1 = new JTextField();
+		textField_1.setEditable(false);
+		textField_1.setColumns(10);
+		textField_1.setBounds(55, 279, 386, 131);
+		searchPalletpanel.add(textField_1);
+		
+		JLabel label_1 = new JLabel("Info");
+		label_1.setBounds(56, 233, 70, 15);
+		searchPalletpanel.add(label_1);
 
 
 
 		//Search Batch tab////////////////////////////
 
 		JPanel searchBatchPanel = new JPanel();
-		tabbedPane_1.addTab("Search Batch", null, searchBatchPanel, null);
+		tabbedPane_1.addTab("Search by batch number", null, searchBatchPanel, null);
 		searchBatchPanel.setLayout(null);
 
 		batchNumberField = new JTextField();
@@ -235,7 +228,7 @@ public class GUI {
 		lblNewLabel.setBounds(45, 12, 101, 15);
 		blockingPanel.add(lblNewLabel);
 
-
+		
 
 		frame.setVisible(true);
 	}
