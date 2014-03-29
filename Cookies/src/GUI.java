@@ -174,7 +174,7 @@ public class GUI {
 				columnNames.add("Pallet Id");
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
-				Vector<Vector<String>> data = be.getStatusData(status);
+				Vector<Vector<String>> data = be.searchByStatus(status);
 				return new DefaultTableModel(data, columnNames);
 			}
 		});
@@ -480,7 +480,7 @@ public class GUI {
 
 		public StatusListModel(BackEnd be){
 			//TODO: implementera nedan
-//			statuses = be.getStatuses();
+			statuses = be.getStatuses();
 		}
 
 		@Override
