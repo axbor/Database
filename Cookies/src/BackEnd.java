@@ -300,14 +300,13 @@ public class BackEnd {
 			
 			palletInfoSet = getPalletInfo.executeQuery();
 			if(palletInfoSet.next()){
-			sb.append("Pallet number" + palletNbr + " was made in batch " + Integer.toString(palletInfoSet.getInt("batchNumber")));
+			sb.append("Pallet number " + palletNbr + " was made in batch " + Integer.toString(palletInfoSet.getInt("batchNumber")));
 			int orderNbr = palletInfoSet.getInt("orderNumber");
 			if( orderNbr != 0){
 				sb.append("\n It has order number " + orderNbr);
 			}
-			sb.append("\n It's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
-			sb.append("\n The QA-status is currently " + palletInfoSet.getString("QA"));
-			sb.append(palletInfoSet.getString("status"));
+			sb.append("\nIt's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
+			sb.append("\nThe QA-status is currently " + palletInfoSet.getString("QA"));
 			}
 		} catch(SQLException e) {
 			System.err.println(e);
