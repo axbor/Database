@@ -175,6 +175,7 @@ public class GUI {
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
 				Vector<Vector<String>> data = be.searchByStatus(status);
+				System.out.println(data.toString());
 				return new DefaultTableModel(data, columnNames);
 			}
 		});
