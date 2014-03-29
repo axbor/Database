@@ -128,7 +128,7 @@ public class GUI {
 		searchPane.addTab("By cookie", null, searchCookiePanel, null);
 		searchCookiePanel.setLayout(null);
 		
-		JList<String> cookieList = new JList<String>();
+		final JList<String> cookieList = new JList<String>();
 		cookieList.setModel(new CookieListModel(be));
 		cookieList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		JScrollPane cookieScrollPane = new JScrollPane();
@@ -137,12 +137,33 @@ public class GUI {
 		cookieScrollPane.setBounds(12, 12, 148, 364);		
 		
 		JButton btnOk_1 = new JButton("OK");
+		btnOk_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					int index = cookieList.getSelectedIndex();
+					ListModel<String> model = cookieList.getModel();
+					String status = model.getElementAt(index);
+					table = new JTable(buildCookieTableModel(status));
+					JOptionPane.showMessageDialog(null, new JScrollPane(table));
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
+				}
+			}
+
+			private TableModel buildCookieTableModel(String status) {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Pallet Id");
+				columnNames.add("Status");
+				columnNames.add("Batch Id");
+				columnNames.add("QA-result");
+				Vector<Vector<String>> data = be.searchByCookie(status);
+				System.out.println(columnNames.toString());
+				System.out.println(data.toString());
+				return new DefaultTableModel(data, columnNames);
+			}
+		});
 		btnOk_1.setBounds(172, 189, 117, 25);
 		searchCookiePanel.add(btnOk_1);
-		
-		table = new JTable();
-		table.setBounds(313, 30, 327, 346);
-		searchCookiePanel.add(table);
 		
 		//search status Tab /////////////////////////
 		
@@ -176,8 +197,6 @@ public class GUI {
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
 				Vector<Vector<String>> data = be.searchByStatus(status);
-				System.out.println(columnNames.toString());
-				System.out.println(data.toString());
 				return new DefaultTableModel(data, columnNames);
 			}
 		});
@@ -279,7 +298,7 @@ public class GUI {
 		textArea_1 = new JTextArea();
 		textArea_1.setEditable(false);
 		textArea_1.setColumns(10);
-		textArea_1.setBounds(55, 279, 386, 131);
+		textArea_1.setBounds(55, 279, 557, 131);
 		searchPalletpanel.add(textArea_1);
 		
 		JLabel label_1 = new JLabel("Info");
