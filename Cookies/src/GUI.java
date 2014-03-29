@@ -140,7 +140,7 @@ public class GUI {
 		statusList.setBounds(12, 49, 148, 364);
 		searchStatuspanel.add(statusList);
 
-		Object[][] statusInfo = ;
+		Object[][] statusInfo = {{"1","1","kaka","bra"},{"1","1","kaka","bra"}};
 		JButton button_3 = new JButton("Search");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -161,7 +161,7 @@ public class GUI {
 		searchStatuspanel.add(button_3);
 		
 		String[] searchColumns = {"Pallet number", "Batch Number", "Cookie", "Status"};
-		table_2 = new JTable(data, searchColumns);
+		table_2 = new JTable(statusInfo, searchColumns);
 		table_2.setBounds(313, 67, 327, 346);
 		searchStatuspanel.add(table_2);
 		
