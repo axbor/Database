@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import javax.print.DocFlavor.READER;
 
 
 
@@ -16,9 +15,7 @@ public class BackEnd {
 
 	private Connection conn;
 	private String createPalletQuery;
-	private String getNbrOfBatchesQuery;
 	private String createBatchQuery;
-	private String getIngredientAmountRecipeQuery;
 	private String getIngredientsQuery;
 	private String updateMaterialQuery;
 	private String getMaterialAmountQuery;
@@ -28,25 +25,47 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
+	private String getStatusQuery;
+	private String getBlockedPalletsQuery;
+	private String setBlockedPalletsQuery;
+	private String movePalletToStorageQuery;
+	private String searchByStatusQuery;
+	private String getPalletsInBatchQuery; 
+	private String searchByCookieQuery;
+	private String searchByDateQuery;
 
+	private String palletExistsQuery;
+	private String getCustomersQuery;
+	
+	
 	public BackEnd(){
 		conn = null;
 		
 //		createPalletQuery = "Insert into Pallets values (null,?,created)";
 //		getNbrOfBatchesQuery = "select ";
 		createBatchQuery = "insert into ProductionBatch values( default, ?, now(), 'Untested')";
-		getIngredientAmountRecipeQuery = "select amount from RawMaterial where ingredientName = ?";
 		getIngredientsQuery = "select ingredientName, amount from CookieContains where cookieName = ?";
 		updateMaterialQuery = "update RawMaterial set amount = amount - ? where ingredientName = ?";
 		getMaterialAmountQuery = "select amount from RawMaterial where ingredientName = ?";
 		getBatchInfoQuery = "select cookieName, prodDate, QA from ProductionBatch where batchNumber = ?";
-		getPalletInfoQuery = "select orderNumber, status from Pallet where palletNumber = ?";
+		getPalletInfoQuery = "select batchNumber, orderNumber, status, cookieName, prodDate, QA  from Pallet natural join PalletsInBatch natural join productionBatch where palletNumber = ?";
 		getBatchesQuery = "select batchNumber, cookieName from ProductionBatch";
 		getCookiesQuery = "select cookieName from Recipe";
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
-		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
+		createPalletQuery = "insert into Pallet values(default, null, 'in production', null)";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
-+		getStatusQuery = "select status from Pallet group by status";
+		getStatusQuery = "select status from Pallet group by status";
+		getBlockedPalletsQuery = "select palletNumber )from PalletsInBatch where batchNumber = ?";
+		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
+		movePalletToStorageQuery = "update Pallet set status = 'in storage', set prodTime = now() where palletNumber = ?";
+		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
+		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
+		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
+		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
+
+		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
+
+		getCustomersQuery = "select customerName from Customer";
 
 	}
 	
@@ -228,8 +247,7 @@ public class BackEnd {
 			PalInBatchStmt.setInt(2,  batchNbr);
 			PalInBatchStmt.execute();
 			System.out.println(palletNbr);
-			return palletNbr;			
-			
+			return palletNbr;					
 			
 		}
 		} catch(SQLException e) {
@@ -238,8 +256,6 @@ public class BackEnd {
 		}
 		return -1 ;
 	}
-
-
 
 	public String getBatchInfo(int batchNbr) {
 		PreparedStatement getBatchInfo;
@@ -254,10 +270,29 @@ public class BackEnd {
 			
 			batchInfoSet = getBatchInfo.executeQuery();
 			batchInfoSet.next();
-			sb.append("Batch number" + batchNbr + " has ");
-			sb.append(batchInfoSet.getString("cookieName") + " and was produced on ");
-			sb.append(batchInfoSet.getString("prodDate") + " and has the QA result: ");
-			sb.append(batchInfoSet.getString("QA"));
+			sb.append("Batch number " + batchNbr + " has ");
+			sb.append(batchInfoSet.getString("cookieName") + ". " + "\n");
+			sb.append("It was produced on " + batchInfoSet.getString("prodDate") + " and has the QA result: ");
+			sb.append(batchInfoSet.getString("QA") + "\n");
+			sb.append("The following pallets are in the batch: \n");
+			sb.append(getPalletsInBatch(batchNbr));
+		} catch(SQLException e) {
+			System.err.println(e);
+		}
+		return sb.toString();
+	}
+
+	private String getPalletsInBatch(int batchNbr) {
+		PreparedStatement getPallets;
+		ResultSet rs;
+		StringBuilder sb = new StringBuilder();
+		try {
+			getPallets = conn.prepareStatement(getPalletsInBatchQuery);
+			getPallets.setInt(1, batchNbr);
+			rs = getPallets.executeQuery();
+			while(rs.next()) {
+				sb.append(rs.getString(1) + ", ");
+			}
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
@@ -273,32 +308,55 @@ public class BackEnd {
 			getPalletInfo.setInt(1, palletNbr);
 			
 			palletInfoSet = getPalletInfo.executeQuery();
-			palletInfoSet.next();
-			sb.append("Pallet number" + palletNbr + " belongs to order number ");
-			sb.append(palletInfoSet.getString("orderNumber") + " and has status: ");
-			sb.append(palletInfoSet.getString("status"));
+			if(palletInfoSet.next()){
+			sb.append("Pallet number " + palletNbr + " was made in batch " + Integer.toString(palletInfoSet.getInt("batchNumber")));
+			int orderNbr = palletInfoSet.getInt("orderNumber");
+			if( orderNbr != 0){
+				sb.append("\n It has order number " + orderNbr);
+			}
+			sb.append("\nIt's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
+			}
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
 		return sb.toString();
 	}
 
-	public boolean blockBatch(int batchNbr) {
+	public ArrayList<Integer> blockBatch(int batchNbr) {
 		PreparedStatement blockBatches;
+		ArrayList<Integer> blockedPalletsNbr = new ArrayList<Integer>();
+
 		if(!batchExist(batchNbr)) {
-			return false;
+			return null;
 		}
 		try {
 			blockBatches = conn.prepareStatement(blockBatchQuery);
 			blockBatches.setInt(1, batchNbr);
 			blockBatches.execute();
+		
+		
+		PreparedStatement blockPalletsNbr = conn.prepareStatement(getBlockedPalletsQuery);
+		blockPalletsNbr.setInt(1, batchNbr);
+		ResultSet blockResult = blockPalletsNbr.executeQuery();
+		while(blockResult.next()){
+			blockedPalletsNbr.add(blockResult.getInt(1));
+		}
+		
+		PreparedStatement blockPallets = conn.prepareStatement(setBlockedPalletsQuery);
+		for(int palletNbr : blockedPalletsNbr){
+			blockPallets.setInt(1,  palletNbr);
+			blockPallets.executeUpdate();
+		}
+		
+		
 		}catch(SQLException e) {
 			System.err.println(e);
 		}
-		return true;
+		return blockedPalletsNbr;
+
 	}
 
-	private boolean batchExist(int batchNbr) {
+	public boolean batchExist(int batchNbr) {
 		PreparedStatement checkBatches;
 		ResultSet checkBatchSet;
 		try {
@@ -333,6 +391,7 @@ public class BackEnd {
 	}
 
 	public ArrayList<String> getCookies() {
+
 		PreparedStatement getCookies;
 		ResultSet cookieSet;
 		ArrayList<String> cookies = new ArrayList<String>();
@@ -348,9 +407,35 @@ public class BackEnd {
 		return cookies;
 	}
 	
-	public void movePalletToStorage(int palletNbr){
-		//TODO : this should move pallets from "in production" to "in storage"
-		return;
+	public boolean palletExists(int palletNbr){
+		try{
+			PreparedStatement palletExists = conn.prepareStatement(palletExistsQuery);
+			ResultSet palletExistsResult = palletExists.executeQuery();
+			if(palletExistsResult.next()){
+				return true;
+			}
+		}catch(SQLException e){
+			System.err.print(e);
+		}
+		return false;
+
+	}
+	public boolean movePalletToStorage(int palletNbr){
+		
+		if(!palletExists(palletNbr)){
+			return false;
+		}
+		
+		try{
+		PreparedStatement movePalletStmt = conn.prepareStatement(movePalletToStorageQuery);
+		movePalletStmt.setInt(1,  palletNbr);
+		movePalletStmt.execute();
+		}catch(SQLException e){
+ 			System.err.println(e);
+ 			return false;
+		}
+		
+		return true;
 	}
 
 	public ArrayList<String> getStatuses() {
@@ -368,4 +453,125 @@ public class BackEnd {
  	}
  		return statuses;
   	}
+	
+	public Vector<Vector<String>> searchByStatus(String status){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByStatusQuery);
+		searchStmt.setString(1, status);
+		ResultSet searchResult = searchStmt.executeQuery();
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("cookieName"));
+			row.add(searchResult.getString("QA"));
+
+			list.add(row);
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
+	
+	public Vector<Vector<String>> searchByCookie(String cookieName){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByCookieQuery);
+		searchStmt.setString(1, cookieName);
+		ResultSet searchResult = searchStmt.executeQuery();
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("status"));
+			row.add(searchResult.getString("QA"));
+
+			list.add(row);
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
+	public Vector<Vector<String>> searchByDate(java.sql.Date startDate, java.sql.Date endDate){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByDateQuery);
+		searchStmt.setDate(1, startDate);
+		searchStmt.setDate(2,  endDate);
+		ResultSet searchResult = searchStmt.executeQuery();
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("cookieName"));
+			row.add(searchResult.getString("status"));
+			row.add(searchResult.getString("QA"));
+			row.add(searchResult.getDate("prodDate").toString());
+
+			list.add(row);
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+
+	
+	public Vector<Vector<String>> searchByCustomer(String customer){
+		
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		// TODO: impement this
+		return list;
+		
+	}
+	
+	
+	public boolean movePalletToDelivered(int palletNbr){
+		
+		if(!palletExists(palletNbr)){
+			return false;
+		}
+		
+		try{
+			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered' where palletNumber = ?");
+			movePalletStmt.setInt(1,  palletNbr);
+			movePalletStmt.execute();
+			}catch(SQLException e){
+	 			System.err.println(e);
+	 			return false;
+			}
+			
+			return true;
+	}
+	
+	
+
+
+	public ArrayList<String> getCustomers() {
+		ArrayList<String> customers = new ArrayList<String>();
+ 		PreparedStatement getCustomers;
+ 		ResultSet rs;
+ 		try {
+ 		getCustomers= conn.prepareStatement(getCustomersQuery);
+ 			rs = getCustomers.executeQuery();
+ 			while(rs.next()) {
+ 				customers.add(rs.getString(1));
+ 			}
+ 		} catch(SQLException e) {
+ 			System.err.println(e);
+ 		}
+ 		return customers;
+  	}
+
 }
