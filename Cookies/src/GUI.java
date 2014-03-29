@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -35,8 +37,8 @@ public class GUI {
 	private JTable table;
 	private JTable table_1;
 	private JTable table_2 = new JTable();
-	private JTextField startDate;
-	private JTextField endDate;
+	private JTextField startDateField;
+	private JTextField endDateField;
 	private JTable timeTable;
 	private JTextField deliverTextField;
 
@@ -142,8 +144,8 @@ public class GUI {
 				try{
 					int index = cookieList.getSelectedIndex();
 					ListModel<String> model = cookieList.getModel();
-					String status = model.getElementAt(index);
-					table = new JTable(buildCookieTableModel(status));
+					String cookieName = model.getElementAt(index);
+					table = new JTable(buildCookieTableModel(cookieName));
 					JOptionPane.showMessageDialog(null, new JScrollPane(table));
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
@@ -196,6 +198,7 @@ public class GUI {
 				columnNames.add("Pallet Id");
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
+				columnNames.add("QA-result");
 				Vector<Vector<String>> data = be.searchByStatus(status);
 				return new DefaultTableModel(data, columnNames);
 			}
@@ -241,25 +244,45 @@ public class GUI {
 		lblEndDate.setBounds(212, 68, 70, 15);
 		searchTimepanel.add(lblEndDate);
 		
-		startDate = new JTextField();
-		startDate.setBounds(66, 95, 114, 19);
-		searchTimepanel.add(startDate);
-		startDate.setColumns(10);
+		startDateField = new JTextField();
+		startDateField.setBounds(66, 95, 114, 19);
+		searchTimepanel.add(startDateField);
+		startDateField.setColumns(10);
 		
-		endDate = new JTextField();
-		endDate.setBounds(203, 95, 114, 19);
-		searchTimepanel.add(endDate);
-		endDate.setColumns(10);
+		endDateField = new JTextField();
+		endDateField.setBounds(203, 95, 114, 19);
+		searchTimepanel.add(endDateField);
+		endDateField.setColumns(10);
 		
 		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String startDateString = startDateField.getText();
+				String endDateString = endDateField.getText(); 
+				try{
+					Date startDate = java.sql.Date.valueOf(startDateString);
+					Date endDate = java.sql.Date.valueOf(endDateString);
+					timeTable= new JTable(buildTimeTableModel(startDate, endDate));
+					JOptionPane.showMessageDialog(null, new JScrollPane(timeTable));
+				}catch(IllegalArgumentException err) {
+					JOptionPane.showMessageDialog(null, "Date has to be on the form : YYYY-MM-DD");
+				}
+			}
+
+			private TableModel buildTimeTableModel(Date startDate, Date endDate) {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Batch Id");
+				columnNames.add("Pallet Id");
+				columnNames.add("Cookie");
+				columnNames.add("Status");
+				columnNames.add("QA-result");
+				columnNames.add("Production date");
+				Vector<Vector<String>> data = be.searchByDate(startDate, endDate);
+				return new DefaultTableModel(data, columnNames);
+			}
+		});
 		btnSearch.setBounds(405, 92, 117, 25);
 		searchTimepanel.add(btnSearch);
-		
-		timeTable = new JTable();
-		timeTable.setBounds(66, 126, 538, 278);
-		searchTimepanel.add(timeTable);
-		
-		
 		
 		//search pallet Tab /////////////////////////
 		JPanel searchPalletpanel = new JPanel();
