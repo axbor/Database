@@ -164,10 +164,6 @@ public class GUI {
 					ListModel<String> model = statusList.getModel();
 					String status = model.getElementAt(index);
 					table_2 = new JTable(buildStatusTableModel(status));
-					//TODO: fortsätt här
-//					int palletNbr = be.createBatch(cookie, amount);
-//					JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
-//					palletNbr + " - " + (palletNbr+amount));
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
 				}
@@ -179,7 +175,7 @@ public class GUI {
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
 				Vector<Vector<String>> data = be.getStatusData(status);
-				return null;
+				return new DefaultTableModel(data, columnNames);
 			}
 		});
 		button_3.setBounds(172, 226, 117, 25);
