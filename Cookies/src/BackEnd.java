@@ -33,8 +33,9 @@ public class BackEnd {
 	private String getPalletsInBatchQuery; 
 	private String searchByCookieQuery;
 	private String searchByDateQuery;
-	private String searchByCustomerQuery;
+
 	private String palletExistsQuery;
+	private String getCustomersQuery;
 	
 	
 	public BackEnd(){
@@ -61,8 +62,11 @@ public class BackEnd {
 		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
 		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
+
 		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
-		//searchByCustomerQuery = ""
+
+		getCustomersQuery = "select customerName from Customer";
+
 	}
 	
 	public boolean openConnection() {
@@ -311,7 +315,6 @@ public class BackEnd {
 				sb.append("\n It has order number " + orderNbr);
 			}
 			sb.append("\nIt's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
-			sb.append("\nThe QA-status is currently " + palletInfoSet.getString("QA"));
 			}
 		} catch(SQLException e) {
 			System.err.println(e);
@@ -353,7 +356,7 @@ public class BackEnd {
 
 	}
 
-	private boolean batchExist(int batchNbr) {
+	public boolean batchExist(int batchNbr) {
 		PreparedStatement checkBatches;
 		ResultSet checkBatchSet;
 		try {
@@ -498,7 +501,7 @@ public class BackEnd {
 		return list;
 	}
 	
-	public Vector<Vector<String>> searchByDate(Date startDate, Date endDate){
+	public Vector<Vector<String>> searchByDate(java.sql.Date startDate, java.sql.Date endDate){
 		Vector<Vector<String>> list = new Vector<Vector<String>>();
 		try{
 		PreparedStatement searchStmt = conn.prepareStatement(searchByDateQuery);
@@ -523,7 +526,7 @@ public class BackEnd {
 		
 		return list;
 	}
-	
+
 	
 	public Vector<Vector<String>> searchByCustomer(String customer){
 		
@@ -553,4 +556,21 @@ public class BackEnd {
 	}
 	
 	
+
+	public ArrayList<String> getCustomers() {
+		ArrayList<String> customers = new ArrayList<String>();
+ 		PreparedStatement getCustomers;
+ 		ResultSet rs;
+ 		try {
+ 		getCustomers= conn.prepareStatement(getCustomersQuery);
+ 			rs = getCustomers.executeQuery();
+ 			while(rs.next()) {
+ 				customers.add(rs.getString(1));
+ 			}
+ 		} catch(SQLException e) {
+ 			System.err.println(e);
+ 		}
+ 		return customers;
+  	}
+
 }

@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.*;
@@ -35,8 +37,8 @@ public class GUI {
 	private JTable table;
 	private JTable table_1;
 	private JTable table_2 = new JTable();
-	private JTextField startDate;
-	private JTextField endDate;
+	private JTextField startDateField;
+	private JTextField endDateField;
 	private JTable timeTable;
 	private JTextField deliverTextField;
 
@@ -136,14 +138,14 @@ public class GUI {
 		searchCookiePanel.add(cookieScrollPane);
 		cookieScrollPane.setBounds(12, 12, 148, 364);		
 		
-		JButton btnOk_1 = new JButton("OK");
+		JButton btnOk_1 = new JButton("Search");
 		btnOk_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try{
 					int index = cookieList.getSelectedIndex();
 					ListModel<String> model = cookieList.getModel();
-					String status = model.getElementAt(index);
-					table = new JTable(buildCookieTableModel(status));
+					String cookieName = model.getElementAt(index);
+					table = new JTable(buildCookieTableModel(cookieName));
 					JOptionPane.showMessageDialog(null, new JScrollPane(table));
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
@@ -157,8 +159,6 @@ public class GUI {
 				columnNames.add("Batch Id");
 				columnNames.add("QA-result");
 				Vector<Vector<String>> data = be.searchByCookie(status);
-				System.out.println(columnNames.toString());
-				System.out.println(data.toString());
 				return new DefaultTableModel(data, columnNames);
 			}
 		});
@@ -196,6 +196,7 @@ public class GUI {
 				columnNames.add("Pallet Id");
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
+				columnNames.add("QA-result");
 				Vector<Vector<String>> data = be.searchByStatus(status);
 				return new DefaultTableModel(data, columnNames);
 			}
@@ -203,25 +204,7 @@ public class GUI {
 		button_3.setBounds(172, 226, 117, 25);
 		searchStatuspanel.add(button_3);
 		
-		//search delivery Tab /////////////////////////
 		
-		JPanel searchDeliverypanel = new JPanel();
-		searchPane.addTab("By delivery", null, searchDeliverypanel, null);
-		searchDeliverypanel.setLayout(null);
-		
-		JList<String> deliveryList = new JList<String>();
-		deliveryList.setModel(new DeliveryListModel(be));
-		deliveryList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		deliveryList.setBounds(12, 40, 148, 364);
-		searchDeliverypanel.add(deliveryList);
-		
-		JButton button_2 = new JButton("OK");
-		button_2.setBounds(172, 217, 117, 25);
-		searchDeliverypanel.add(button_2);
-		
-		table_1 = new JTable();
-		table_1.setBounds(313, 58, 327, 346);
-		searchDeliverypanel.add(table_1);
 		
 		//search time Tab /////////////////////////
 		
@@ -241,25 +224,45 @@ public class GUI {
 		lblEndDate.setBounds(212, 68, 70, 15);
 		searchTimepanel.add(lblEndDate);
 		
-		startDate = new JTextField();
-		startDate.setBounds(66, 95, 114, 19);
-		searchTimepanel.add(startDate);
-		startDate.setColumns(10);
+		startDateField = new JTextField();
+		startDateField.setBounds(66, 95, 114, 19);
+		searchTimepanel.add(startDateField);
+		startDateField.setColumns(10);
 		
-		endDate = new JTextField();
-		endDate.setBounds(203, 95, 114, 19);
-		searchTimepanel.add(endDate);
-		endDate.setColumns(10);
+		endDateField = new JTextField();
+		endDateField.setBounds(203, 95, 114, 19);
+		searchTimepanel.add(endDateField);
+		endDateField.setColumns(10);
 		
 		JButton btnSearch = new JButton("Search");
+		btnSearch.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String startDateString = startDateField.getText();
+				String endDateString = endDateField.getText(); 
+				try{
+					java.sql.Date startDate = java.sql.Date.valueOf(startDateString);
+					java.sql.Date endDate = java.sql.Date.valueOf(endDateString);
+					timeTable= new JTable(buildTimeTableModel(startDate, endDate));
+					JOptionPane.showMessageDialog(null, new JScrollPane(timeTable));
+				}catch(IllegalArgumentException err) {
+					JOptionPane.showMessageDialog(null, "Date has to be on the form : YYYY-MM-DD");
+				}
+			}
+
+			private TableModel buildTimeTableModel(java.sql.Date startDate, java.sql.Date endDate) {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Batch Id");
+				columnNames.add("Pallet Id");
+				columnNames.add("Cookie");
+				columnNames.add("Status");
+				columnNames.add("QA-result");
+				columnNames.add("Prod. date");
+				Vector<Vector<String>> data = be.searchByDate(startDate, endDate);
+				return new DefaultTableModel(data, columnNames);
+			}
+		});
 		btnSearch.setBounds(405, 92, 117, 25);
 		searchTimepanel.add(btnSearch);
-		
-		timeTable = new JTable();
-		timeTable.setBounds(66, 126, 538, 278);
-		searchTimepanel.add(timeTable);
-		
-		
 		
 		//search pallet Tab /////////////////////////
 		JPanel searchPalletpanel = new JPanel();
@@ -283,6 +286,11 @@ public class GUI {
 					int palletNbr = Integer.parseInt(text);
 					if(palletNbr < 1) {
 						JOptionPane.showMessageDialog(null, "Amount has to be bigger than 0");
+						return;
+					}
+					if(!be.palletExists(palletNbr)) {
+						JOptionPane.showMessageDialog(null, "Pallet does not exist");
+						return;
 					}else {
 						String info = be.getPalletInfo(palletNbr);
 						textArea_1.setText(info);
@@ -328,6 +336,11 @@ public class GUI {
 					int batchNbr = Integer.parseInt(text);
 					if(batchNbr < 1) {
 						JOptionPane.showMessageDialog(null, "Amount has to be bigger than 0");
+						return;
+					}
+					if(!be.batchExist(batchNbr)) {
+						JOptionPane.showMessageDialog(null, "The batch does not exist");
+						return;
 					}else {
 						String info = be.getBatchInfo(batchNbr);
 						textArea_3.setText(info);
@@ -350,6 +363,44 @@ public class GUI {
 		label_3.setBounds(56, 233, 70, 15);
 		searchBatchpanel.add(label_3);
 
+
+		//search Customer Tab /////////////////////////
+		JPanel searchCustomerPanel = new JPanel();
+		searchCustomerPanel.setLayout(null);
+		searchPane.addTab("By customer", null, searchCustomerPanel, null);
+		
+
+		final JList<String> customerList = new JList<String>();
+		customerList.setModel(new CustomerListModel(be));
+		customerList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		customerList.setBounds(12, 49, 148, 364);
+		searchCustomerPanel.add(customerList);
+
+		JButton searchCustomerBtn = new JButton("Search");
+		searchCustomerBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					int index = customerList.getSelectedIndex();
+					ListModel<String> model = customerList.getModel();
+					String customer = model.getElementAt(index);
+					JTable customerTable = new JTable(buildCustomerTableModel(customer));
+					JOptionPane.showMessageDialog(null, new JScrollPane(customerTable));
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
+				}
+			}
+
+			private TableModel buildCustomerTableModel(String customer) {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Pallet id");
+				columnNames.add("Delivery date");
+				columnNames.add("Delivery time");
+				Vector<Vector<String>> data = be.searchByCustomer(customer);
+				return new DefaultTableModel(data, columnNames);
+			}
+		});
+		searchCustomerBtn.setBounds(172, 226, 117, 25);
+		searchCustomerPanel.add(searchCustomerBtn);
 
 
 
@@ -377,7 +428,6 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The batch number has to be a positive integer");
 						return;
 					}
-					//TODO: implementera den nedanför
 					ArrayList<Integer> blockedPallets = be.blockBatch(number);
 					
 					if(blockedPallets == null){
@@ -409,7 +459,7 @@ public class GUI {
 		lblNewLabel.setBounds(152, 104, 424, 15);
 		blockingPanel.add(lblNewLabel);
 		
-		// BLOCKING PANEL ////////////////////////////
+		// DELIVER PANEL ////////////////////////////
 		
 		
 		JPanel deliverPanel = new JPanel();
@@ -435,6 +485,10 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The order number has to be a positive integer");
 						return;
 					}
+					if(!be.orderExists(orderNbr)) {
+						JOptionPane.showMessageDialog(null, "The order does not exist");
+						return;
+					}
 					//TODO: implementera den nedanför
 //					if(!be.deliverOrder(orderNbr)) {
 //						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
@@ -450,6 +504,46 @@ public class GUI {
 		deliverPanel.add(btnDeliver);
 
 
+		// Move PANEL ////////////////////////////
+		
+		
+		JPanel movePanel = new JPanel();
+		tabbedPane_1.addTab("Move pallet", null, movePanel, null);
+		movePanel.setLayout(null);
+				
+		JLabel moveLabel = new JLabel("Enter the pallet number you want to move from production to storage");
+		moveLabel.setBounds(136, 43, 429, 15);
+		movePanel.add(moveLabel);
+		
+		final JTextField moveTextField = new JTextField();
+		moveTextField.setBounds(277, 125, 114, 19);
+		movePanel.add(moveTextField);
+		moveTextField.setColumns(10);
+		
+		JButton btnMove = new JButton("Move pallet");
+		btnMove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = moveTextField.getText();
+				try{
+					int palletNbr = Integer.parseInt(text);
+					if(palletNbr < 1) {
+						JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
+						return;
+					}
+					if(!be.movePalletToStorage(palletNbr)) {
+						JOptionPane.showMessageDialog(null, "The pallet does not exist");
+						return;
+					} else {
+						JOptionPane.showMessageDialog(null, "The pallet has been moved to storage");
+					}
+					
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
+				}
+			}
+		});
+		btnMove.setBounds(274, 250, 117, 25);
+		movePanel.add(btnMove);
 		
 
 		frame.setVisible(true);
@@ -489,31 +583,10 @@ public class GUI {
 		}
 	}
 	
-	class DeliveryListModel extends AbstractListModel<String> {
-		private ArrayList<String> delivery = new ArrayList<String>();
-
-		public DeliveryListModel(BackEnd be){
-			//TODO: implementera nedan
-//			delivery = be.getDeliveries();
-			delivery.add("skicakd");
-		}
-
-		@Override
-		public int getSize() {
-			return delivery.size();
-		}
-
-		@Override
-		public String getElementAt(int index) {
-			return delivery.get(index);
-		}
-	}
-	
 	class StatusListModel extends AbstractListModel<String> {
 		private ArrayList<String> statuses = new ArrayList<String>();
 
 		public StatusListModel(BackEnd be){
-			//TODO: implementera nedan
 			statuses = be.getStatuses();
 		}
 
@@ -525,6 +598,24 @@ public class GUI {
 		@Override
 		public String getElementAt(int index) {
 			return statuses.get(index);
+		}
+	}
+	
+	class CustomerListModel extends AbstractListModel<String> {
+		private ArrayList<String> customers = new ArrayList<String>();
+
+		public CustomerListModel(BackEnd be){
+			customers = be.getCustomers();
+		}
+
+		@Override
+		public int getSize() {
+			return customers.size();
+		}
+
+		@Override
+		public String getElementAt(int index) {
+			return customers.get(index);
 		}
 	}
 }
