@@ -485,7 +485,7 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The order number has to be a positive integer");
 						return;
 					}
-					if(!be.orderExists(orderNbr)) {
+					if(!be.orderExist(orderNbr)) {
 						JOptionPane.showMessageDialog(null, "The order does not exist");
 						return;
 					}

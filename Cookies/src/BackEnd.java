@@ -520,4 +520,20 @@ public class BackEnd {
  		}
  		return customers;
   	}
+	
+//	public boolean orderExist(int orderNbr) {
+//		PreparedStatement checkOrders;
+//		ResultSet rs;
+//		try {
+//			checkOrders = conn.prepareStatement(getBatchInfoQuery);
+//			checkBatches.setInt(1, batchNbr);
+//			checkBatchSet = checkBatches.executeQuery();
+//			if(!checkBatchSet.next()){
+//				return false;
+//			}
+//		}catch(SQLException e) {
+//			System.err.println(e);
+//		}
+//		return true;
+//	}
 }
