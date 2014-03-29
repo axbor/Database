@@ -10,6 +10,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.xml.stream.Location;
+import javax.xml.ws.handler.MessageContext.Scope;
 
 /**
  * MovieGUI is the user interface to the movie database. It sets up the main
@@ -28,12 +29,12 @@ public class GUI {
 	private int amount;
 	private JList<String> list;
 	private JTextField textField;
-	private JTextField textField_1;
 	private JTextField textField_2;
+	private JTextArea textArea_1;
 	private JTextArea textArea_3;
 	private JTable table;
 	private JTable table_1;
-	private JTable table_2;
+	private JTable table_2 = new JTable();
 	private JTextField startDate;
 	private JTextField endDate;
 	private JTable timeTable;
@@ -155,7 +156,6 @@ public class GUI {
 		statusList.setBounds(12, 49, 148, 364);
 		searchStatuspanel.add(statusList);
 
-		DefaultTableModel dtm = new DefaultTableModel();
 		JButton button_3 = new JButton("Search");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -164,6 +164,7 @@ public class GUI {
 					ListModel<String> model = statusList.getModel();
 					String status = model.getElementAt(index);
 					table_2 = new JTable(buildStatusTableModel(status));
+					JOptionPane.showMessageDialog(null, new JScrollPane(table_2));
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
 				}
@@ -175,16 +176,13 @@ public class GUI {
 				columnNames.add("Batch Id");
 				columnNames.add("Cookie");
 				Vector<Vector<String>> data = be.searchByStatus(status);
+				System.out.println(columnNames.toString());
 				System.out.println(data.toString());
 				return new DefaultTableModel(data, columnNames);
 			}
 		});
 		button_3.setBounds(172, 226, 117, 25);
 		searchStatuspanel.add(button_3);
-		
-		JScrollPane scrollStatusPane = new JScrollPane(table_2);
-		searchStatuspanel.add(scrollStatusPane);
-		scrollStatusPane.setBounds(313, 29, 363, 384);
 		
 		//search delivery Tab /////////////////////////
 		
@@ -259,14 +257,30 @@ public class GUI {
 		searchPalletpanel.add(label);
 		
 		JButton button = new JButton("Ok");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = textField.getText();
+				try{
+					int palletNbr = Integer.parseInt(text);
+					if(palletNbr < 1) {
+						JOptionPane.showMessageDialog(null, "Amount has to be bigger than 0");
+					}else {
+						String info = be.getPalletInfo(palletNbr);
+						textArea_1.setText(info);
+					}
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
+				}
+			}
+		});
 		button.setBounds(172, 200, 117, 25);
 		searchPalletpanel.add(button);
 		
-		textField_1 = new JTextField();
-		textField_1.setEditable(false);
-		textField_1.setColumns(10);
-		textField_1.setBounds(55, 279, 386, 131);
-		searchPalletpanel.add(textField_1);
+		textArea_1 = new JTextArea();
+		textArea_1.setEditable(false);
+		textArea_1.setColumns(10);
+		textArea_1.setBounds(55, 279, 386, 131);
+		searchPalletpanel.add(textArea_1);
 		
 		JLabel label_1 = new JLabel("Info");
 		label_1.setBounds(56, 233, 70, 15);
