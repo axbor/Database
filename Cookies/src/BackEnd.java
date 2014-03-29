@@ -58,7 +58,7 @@ public class BackEnd {
 		getStatusQuery = "select status from Pallet group by status";
 		getBlockedPalletsQuery = "select palletNumber )from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
-		movePalletToStorageQuery = "update Pallet set status = 'in storage', set prodTime = now() where palletNumber = ?";
+		movePalletToStorageQuery = "update Pallet set status = 'in storage', prodTime = now() where palletNumber = ?";
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
@@ -603,6 +603,12 @@ public class BackEnd {
 			System.err.println(e);
 		}
 		return true;
+	}
+
+	public boolean pallletInProd(int palletNbr) {
+		
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

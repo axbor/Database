@@ -530,10 +530,12 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
 						return;
 					}
-					if(!be.movePalletToStorage(palletNbr)) {
+					if(!be.pallletInProd(palletNbr)) {
+						JOptionPane.showMessageDialog(null, "The pallet is not in production any more");
+					}else if(!be.movePalletToStorage(palletNbr)) {
 						JOptionPane.showMessageDialog(null, "The pallet does not exist");
 						return;
-					} else {
+					}else {
 						JOptionPane.showMessageDialog(null, "The pallet has been moved to storage");
 					}
 					
