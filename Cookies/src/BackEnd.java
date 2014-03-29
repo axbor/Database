@@ -67,7 +67,7 @@ public class BackEnd {
 		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
 
 		getCustomersQuery = "select customerName from Customer";
-		getOrderInfoQuery = "select orderNumber from Ordering";
+		getOrderInfoQuery = "select * from Ordering where orderNumber = ?";
 		
 	}
 	
