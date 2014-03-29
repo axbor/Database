@@ -30,6 +30,9 @@ public class GUI {
 	private JTable table;
 	private JTable table_1;
 	private JTable table_2;
+	private JTextField startDate;
+	private JTextField endDate;
+	private JTable timeTable;
 
 	/**
 	 * Create a GUI object and connect to the database.
@@ -55,15 +58,17 @@ public class GUI {
 		list = new JList<String>();
 		list.setModel(new CookieListModel(be));
 		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		createPanel.add(list);
-		list.setBounds(50, 94, 150, 200);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setViewportView(list);
+		createPanel.add(scrollPane);
+		scrollPane.setBounds(50, 94, 150, 200);
 
 		cookieAmountField = new JTextField();
-		cookieAmountField.setBounds(284, 106, 144, 62);
+		cookieAmountField.setBounds(368, 195, 144, 62);
 		createPanel.add(cookieAmountField);
 		cookieAmountField.setColumns(10);
 
-		JButton btnOk = new JButton("OK");
+		JButton btnOk = new JButton("Create pallet");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = cookieAmountField.getText();
@@ -84,11 +89,11 @@ public class GUI {
 				}
 			}
 		});
-		btnOk.setBounds(284, 291, 117, 25);
+		btnOk.setBounds(368, 290, 155, 25);
 		createPanel.add(btnOk);
 
-		JLabel lblAmountOfPallets = new JLabel("Amount of pallets you want to create of selected cookie");
-		lblAmountOfPallets.setBounds(284, 79, 136, 15);
+		JLabel lblAmountOfPallets = new JLabel("Enter amount of pallets you want to create of selected cookie");
+		lblAmountOfPallets.setBounds(218, 114, 448, 44);
 		createPanel.add(lblAmountOfPallets);
 
 		JLabel lblChooseACookie = new JLabel("Choose a cookie type to create");
@@ -109,9 +114,10 @@ public class GUI {
 		JList<String> cookieList = new JList<String>();
 		cookieList.setModel(new CookieListModel(be));
 		cookieList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		cookieList.setBounds(12, 12, 148, 364);
-		searchCookiePanel.add(cookieList);
-		
+		JScrollPane cookieScrollPane = new JScrollPane();
+		cookieScrollPane.setViewportView(cookieList);
+		searchCookiePanel.add(cookieScrollPane);
+		cookieScrollPane.setBounds(12, 12, 148, 364);		
 		
 		JButton btnOk_1 = new JButton("OK");
 		btnOk_1.setBounds(172, 189, 117, 25);
@@ -165,6 +171,37 @@ public class GUI {
 		
 		JPanel searchTimepanel = new JPanel();
 		searchPane.addTab("By time", null, searchTimepanel, null);
+		searchTimepanel.setLayout(null);
+		
+		JLabel lblEnterTheTime = new JLabel("Enter the time interval you want to search pallets for");
+		lblEnterTheTime.setBounds(145, 25, 377, 15);
+		searchTimepanel.add(lblEnterTheTime);
+		
+		JLabel lblNewLabel_1 = new JLabel("Start date");
+		lblNewLabel_1.setBounds(89, 68, 92, 15);
+		searchTimepanel.add(lblNewLabel_1);
+		
+		JLabel lblEndDate = new JLabel("End date");
+		lblEndDate.setBounds(212, 68, 70, 15);
+		searchTimepanel.add(lblEndDate);
+		
+		startDate = new JTextField();
+		startDate.setBounds(66, 95, 114, 19);
+		searchTimepanel.add(startDate);
+		startDate.setColumns(10);
+		
+		endDate = new JTextField();
+		endDate.setBounds(203, 95, 114, 19);
+		searchTimepanel.add(endDate);
+		endDate.setColumns(10);
+		
+		JButton btnSearch = new JButton("Search");
+		btnSearch.setBounds(405, 92, 117, 25);
+		searchTimepanel.add(btnSearch);
+		
+		timeTable = new JTable();
+		timeTable.setBounds(66, 126, 538, 278);
+		searchTimepanel.add(timeTable);
 		
 		
 		
@@ -234,37 +271,43 @@ public class GUI {
 		JPanel blockingPanel = new JPanel();
 		tabbedPane_1.addTab("Blocking", null, blockingPanel, null);
 		blockingPanel.setLayout(null);
+		
+		
+		
+		final JTextField blockTextField = new JTextField();
+		blockTextField.setBounds(259, 131, 156, 85);
+		blockingPanel.add(blockTextField);
+		blockTextField.setColumns(10);
 
-		final JList blockList = new JList();
-		blockList.setBounds(45, 47, 256, 385);
-		blockList.setModel(new BlockingListModel(be));
-		blockList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		blockingPanel.add(blockList);
-
-		JButton btnBlock = new JButton("Block");
+		JButton btnBlock = new JButton("Block batch");
 		btnBlock.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				String text = blockTextField.getText();
 				try{
-					int index = blockList.getSelectedIndex();
-					ListModel<String> model = blockList.getModel();
-					int batchNbr= Integer.parseInt(model.getElementAt(index));
+					int number = Integer.parseInt(text);
+					if(number < 1) {
+						JOptionPane.showMessageDialog(null, "The batch number has to be a positive integer");
+						return;
+					}
 					//TODO: implementera den nedanför
-					if(!be.blockBatch(batchNbr)) {
+					if(!be.blockBatch(number)) {
 						JOptionPane.showMessageDialog(null, "A batch with that number does not exist");
+					}else {
+						JOptionPane.showMessageDialog(null, "Batch number " + number + " has been blocked");
 					}
 				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "The batch number is an integer bigger than 0");
+					JOptionPane.showMessageDialog(null, "The batch number has to be a positive integer");
 				}
 			}
 		});
-		btnBlock.setBounds(398, 228, 71, 25);
+		btnBlock.setBounds(271, 259, 136, 25);
 		blockingPanel.add(btnBlock);
 
 
-
-		JLabel lblNewLabel = new JLabel("Block Batch");
-		lblNewLabel.setBounds(45, 12, 101, 15);
+		JLabel lblNewLabel = new JLabel("Enter number of the batch that did not pass the QA test");
+		lblNewLabel.setBounds(152, 104, 424, 15);
 		blockingPanel.add(lblNewLabel);
+
 
 		
 
@@ -275,7 +318,7 @@ public class GUI {
 		private ArrayList<String> cookies = new ArrayList<String>();
 
 		public CookieListModel(BackEnd be){
-			cookies = be.getCookies();
+			cookies = be.getCookies();		
 		}
 
 		public int getSize() {
