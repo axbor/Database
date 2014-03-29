@@ -43,7 +43,7 @@ public class BackEnd {
 		updateMaterialQuery = "update RawMaterial set amount = amount - ? where ingredientName = ?";
 		getMaterialAmountQuery = "select amount from RawMaterial where ingredientName = ?";
 		getBatchInfoQuery = "select cookieName, prodDate, QA from ProductionBatch where batchNumber = ?";
-		getPalletInfoQuery = "select orderNumber, status from Pallet where palletNumber = ?";
+		getPalletInfoQuery = "select batchNumber, orderNumber, status, cookieName, prodDate, QA  from Pallet natural join PalletsInBatch natural join productionBatch where palletNumber = ?";
 		getBatchesQuery = "select batchNumber, cookieName from ProductionBatch";
 		getCookiesQuery = "select cookieName from Recipe";
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
@@ -299,10 +299,16 @@ public class BackEnd {
 			getPalletInfo.setInt(1, palletNbr);
 			
 			palletInfoSet = getPalletInfo.executeQuery();
-			palletInfoSet.next();
-			sb.append("Pallet number" + palletNbr + " belongs to order number ");
-			sb.append(palletInfoSet.getString("orderNumber") + " and has status: ");
+			if(palletInfoSet.next()){
+			sb.append("Pallet number" + palletNbr + " was made in batch " + Integer.toString(palletInfoSet.getInt("batchNumber")));
+			int orderNbr = palletInfoSet.getInt("orderNumber");
+			if( orderNbr != 0){
+				sb.append("\n It has order number " + orderNbr);
+			}
+			sb.append("\n It's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
+			sb.append("\n The QA-status is currently " + palletInfoSet.getString("QA"));
 			sb.append(palletInfoSet.getString("status"));
+			}
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
@@ -442,5 +448,6 @@ public class BackEnd {
 		
 		return list;
 	}
+	
 	
 }
