@@ -31,6 +31,8 @@ public class BackEnd {
 	private String movePalletQuery;
 	private String searchByStatusQuery;
 	private String getPalletsInBatchQuery; 
+	private String searchByCookieQuery;
+
 	
 	
 	public BackEnd(){
@@ -54,7 +56,8 @@ public class BackEnd {
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
 		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
-		searchByStatusQuery = "select batchNumber, palletNumber, cookieName from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
+		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
+		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
 
 	}
 	
@@ -438,6 +441,32 @@ public class BackEnd {
 			row.add(Integer.toString(searchResult.getInt("batchNumber")));
 			row.add(Integer.toString(searchResult.getInt("palletNumber")));
 			row.add(searchResult.getString("cookieName"));
+			row.add(searchResult.getString("QA"));
+
+			list.add(row);
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
+	
+	public Vector<Vector<String>> searchByCookie(String cookieName){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByCookieQuery);
+		searchStmt.setString(1, cookieName);
+		ResultSet searchResult = searchStmt.executeQuery();
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("status"));
+			row.add(searchResult.getString("QA"));
+
 			list.add(row);
 		}
 		
