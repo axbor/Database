@@ -32,6 +32,7 @@ public class BackEnd {
 	private String searchByStatusQuery;
 	private String getPalletsInBatchQuery; 
 	private String searchByCookieQuery;
+	private String searchByDateQuery;
 
 	
 	
@@ -58,7 +59,7 @@ public class BackEnd {
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
-
+		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
 	}
 	
 	public boolean openConnection() {
@@ -466,6 +467,32 @@ public class BackEnd {
 			row.add(Integer.toString(searchResult.getInt("palletNumber")));
 			row.add(searchResult.getString("status"));
 			row.add(searchResult.getString("QA"));
+
+			list.add(row);
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
+	public Vector<Vector<String>> searchByDate(Date startDate, Date endDate){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByDateQuery);
+		searchStmt.setDate(1, startDate);
+		searchStmt.setDate(2,  endDate);
+		ResultSet searchResult = searchStmt.executeQuery();
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("cookieName"));
+			row.add(searchResult.getString("status"));
+			row.add(searchResult.getString("QA"));
+			row.add(searchResult.getDate("prodDate").toString());
 
 			list.add(row);
 		}
