@@ -320,11 +320,24 @@ public class GUI {
 						return;
 					}
 					//TODO: implementera den nedanför
-					if(!be.blockBatch(number)) {
+					ArrayList<Integer> blockedPallets = be.blockBatch(number);
+					
+					if(blockedPallets == null){
 						JOptionPane.showMessageDialog(null, "A batch with that number does not exist");
 					}else {
-						JOptionPane.showMessageDialog(null, "Batch number " + number + " has been blocked");
+						StringBuilder sb = new StringBuilder();
+						sb.append("\n");
+						for(int nbr : blockedPallets){
+							sb.append(nbr);
+							sb.append("\n");
+						}
+						String blockedStr = sb.toString();
+						JOptionPane.showMessageDialog(null, "The following pallets where blocked: " + blockedStr);
+
+						
 					}
+					
+					
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "The batch number has to be a positive integer");
 				}
