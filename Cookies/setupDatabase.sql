@@ -64,7 +64,7 @@ create table ProductionBatch(
 	foreign key(cookieName) references Recipe(cookieName)
 );
 
-create table BatchesInPallet(
+create table PalletsInBatch(
 	palletNumber int,
 	batchNumber int,
 	primary key(palletNumber, batchNumber),

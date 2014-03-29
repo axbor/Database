@@ -46,8 +46,8 @@ public class BackEnd {
 		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
 		getStatusQuery = "select status from Pallet group by status";
-		getBlockedPalletsQuery = "select palletNumber from Pallet where batchId = ?";
-		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where batchNumber = ?";
+		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
+		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
 
 	}
 	
@@ -305,8 +305,11 @@ public class BackEnd {
 		}
 		
 		PreparedStatement blockPallets = conn.prepareStatement(setBlockedPalletsQuery);
-		blockPallets.setInt(1,  batchNbr);
-		blockPallets.executeUpdate();
+		for(int palletNbr : blockedPalletsNbr){
+			blockPallets.setInt(1,  palletNbr);
+			blockPallets.executeUpdate();
+		}
+		
 		
 		}catch(SQLException e) {
 			System.err.println(e);
