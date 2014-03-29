@@ -28,6 +28,7 @@ public class BackEnd {
 	private String getStatusQuery;
 	private String getBlockedPalletsQuery;
 	private String setBlockedPalletsQuery;
+	private String movePalletQuery;
 
 	public BackEnd(){
 		conn = null;
@@ -48,6 +49,7 @@ public class BackEnd {
 		getStatusQuery = "select status from Pallet group by status";
 		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
+		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
 
 	}
 	
@@ -229,8 +231,7 @@ public class BackEnd {
 			PalInBatchStmt.setInt(2,  batchNbr);
 			PalInBatchStmt.execute();
 			System.out.println(palletNbr);
-			return palletNbr;			
-			
+			return palletNbr;					
 			
 		}
 		} catch(SQLException e) {
@@ -368,9 +369,17 @@ public class BackEnd {
 		return cookies;
 	}
 	
-	public void movePalletToStorage(int palletNbr){
-		//TODO : this should move pallets from "in production" to "in storage"
-		return;
+	public boolean movePalletToStorage(int palletNbr){
+		try{
+		PreparedStatement movePalletStmt = conn.prepareStatement(movePalletQuery);
+		movePalletStmt.setInt(1,  palletNbr);
+		movePalletStmt.execute();
+		}catch(SQLException e){
+ 			System.err.println(e);
+ 			return false;
+		}
+		
+		return true;
 	}
 
 	public ArrayList<String> getStatuses() {
