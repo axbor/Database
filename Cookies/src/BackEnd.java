@@ -2,6 +2,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.print.DocFlavor.READER;
@@ -27,26 +28,24 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
-	private String getStatusQuery;
 
 	public BackEnd(){
 		conn = null;
 		
 //		createPalletQuery = "Insert into Pallets values (null,?,created)";
 //		getNbrOfBatchesQuery = "select ";
-		createBatchQuery = "insert into ProductionBatch values( ?, now(), Untested)";
+		createBatchQuery = "insert into ProductionBatch values( default, ?, now(), 'Untested')";
 		getIngredientAmountRecipeQuery = "select amount from RawMaterial where ingredientName = ?";
-		getIngredientsQuery = "select ingredientName from CookieContains where cookieName = ?";
-		updateMaterialQuery = "update RawMaterial set amount = amount - ? where ingredientName = ?";
+		getIngredientsQuery = "select ingredientName, amount from CookieContains where cookieName = ?";
+		updateMaterialQuery = "update RawMaterial set amount = ? where ingredientName = ?";
 		getMaterialAmountQuery = "select amount from RawMaterial where ingredientName = ?";
 		getBatchInfoQuery = "select cookieName, prodDate, QA from ProductionBatch where batchNumber = ?";
 		getPalletInfoQuery = "select orderNumber, status from Pallet where palletNumber = ?";
 		getBatchesQuery = "select batchNumber, cookieName from ProductionBatch";
 		getCookiesQuery = "select cookieName from Recipe";
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
-		createPalletQuery = "insert into Pallets values(null, 'in production')";
+		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
-		getStatusQuery = "select status from Pallet group by status";
 	}
 	
 	public boolean openConnection() {
@@ -107,51 +106,42 @@ public class BackEnd {
 	
 	public ArrayList<Integer> createBatch(String cookieName, int nbrOfPallets){
 		PreparedStatement createBatch;
-		PreparedStatement getIngredientAmount;
-		ResultSet amountSet;
-		ArrayList<String> ingredientList = getIngredients(cookieName);
-		HashMap<String ,Double> amountExists = new HashMap<String, Double>();
+		HashMap<String ,Double> ingredientMap = getIngredients(cookieName, nbrOfPallets);
+		HashMap<String, Double> amountExists = new HashMap<String, Double>();
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
 		int batchNbr;
-		try {
-			// getting required amount for the specified recipe, also checking that it's available
-			for(int i = 0; i < ingredientList.size(); i ++) { 
-				getIngredientAmount = conn.prepareStatement(getIngredientAmountRecipeQuery);
-				getIngredientAmount.setString(1, ingredientList.get(i));
-				amountSet = getIngredientAmount.executeQuery();
-				amountSet.next();
-				double amount = amountSet.getDouble("amount");
-				amount = amount*54*nbrOfPallets;
-				if (amount < requiredAmount(cookieName) || requiredAmount(cookieName) == -1){
-					return null;
-				}else {
-					amountExists.put(ingredientList.get(i), amount);					
-				}
+		
+		// Checks that the required amount is in stock, and puts the new stock values in the hashmap amountExists
+		for(Entry<String, Double> entry : ingredientMap.entrySet()){
+			double stockAmount = getRawStock(entry.getKey());
+			if(stockAmount == -1 || stockAmount < entry.getValue()){
+				System.out.println("Not enough material in storage");
+				return null;
 			}
+			stockAmount = stockAmount - entry.getValue();
+			amountExists.put(entry.getKey(), stockAmount);
+		}
+		
+		updateRawMaterial(amountExists);
+		
+		
+		try {
 			
+			System.out.println("creating batch");
 			//creates the batch
-			createBatch = conn.prepareStatement(createBatchQuery);
-			createBatch.executeQuery();
+			createBatch = conn.prepareStatement(createBatchQuery, Statement.RETURN_GENERATED_KEYS);
+			createBatch.setString(1, cookieName);
+			createBatch.executeUpdate();
 			ResultSet batchResult = createBatch.getGeneratedKeys();
 			
 			if(batchResult.next()){
 				batchNbr = batchResult.getInt(1);
+				System.out.println("batch created, batchNbr" + batchNbr);
 				//creates the pallets for the specified batch
 				for(int i = 0; i < nbrOfPallets ; i++){
 					palletList.add(createPallet(cookieName, batchNbr));
 				}
 			}
-			
-			
-			//updates the amount of raw material
-			for(int i = 0; i < ingredientList.size(); i ++) {
-				double amount = amountExists.get(i);
-				updateRawMaterial(ingredientList.get(i), amount*54*nbrOfPallets);
-				
-				
-			}
-			
-			
 
 		}catch(SQLException e) {
 			System.err.println(e);
@@ -165,26 +155,28 @@ public class BackEnd {
 		
 	}
 	
-	private double requiredAmount(String cookieName) {
+	private double getRawStock(String ingredientName) {
 		PreparedStatement getAmount;
-		ResultSet amountSet;
+		ResultSet amountResult;
 		double amount = -1;
 		try {
 			getAmount = conn.prepareStatement(getMaterialAmountQuery);
-			getAmount.setString(1, cookieName);
+			getAmount.setString(1, ingredientName);
 			
-			amountSet = getAmount.executeQuery();
-			amountSet.next();
-			amount = amountSet.getDouble("amount");
+			amountResult = getAmount.executeQuery();
+			if(amountResult.next()){
+				amount = amountResult.getDouble("amount");
+			}
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
 		return amount;
 	}
 
-	public ArrayList<String> getIngredients(String cookieName) {
+	public HashMap<String, Double> getIngredients(String cookieName, int nbrOfPallets) {
+		System.out.println("getting ingredients");
 		PreparedStatement getIngredients;
-		ArrayList<String> ingredientList = new ArrayList<String>();
+		HashMap<String, Double> ingredientList = new HashMap<String, Double>();
 		ResultSet ingredients;
 		try{
 			getIngredients = conn.prepareStatement(getIngredientsQuery);
@@ -193,7 +185,7 @@ public class BackEnd {
 			ingredients = getIngredients.executeQuery();
 			
 			while(ingredients.next()){
-				ingredientList.add(ingredients.getString("ingredientName"));
+				ingredientList.put(ingredients.getString("ingredientName"), ingredients.getDouble("amount")*54*nbrOfPallets);
 			}	
 		}catch(SQLException e) {
 			System.err.println(e);
@@ -202,14 +194,18 @@ public class BackEnd {
 		return ingredientList;
 	}
 	
-	public void updateRawMaterial(String ingredientName, double amount){
+	public void updateRawMaterial(HashMap<String, Double> amount ){
 		PreparedStatement updateMaterial;
 		try{
 			updateMaterial = conn.prepareStatement(updateMaterialQuery);
-			updateMaterial.setDouble(1, amount);
-			updateMaterial.setString(2, ingredientName);
+			for(Entry<String,Double> entry : amount.entrySet()){
+		
+				updateMaterial.setDouble(1, entry.getValue());
+				updateMaterial.setString(2, entry.getKey());
+				updateMaterial.execute();
+
+			}
 			
-			updateMaterial.execute();
 		}catch(SQLException e) {
 			System.err.println(e);
 		}
@@ -218,8 +214,8 @@ public class BackEnd {
 	public int createPallet(String recipe, int batchNbr){
 		try{
 		
-		PreparedStatement palletStmt = conn.prepareStatement(createPalletQuery);
-		palletStmt.executeQuery();
+		PreparedStatement palletStmt = conn.prepareStatement(createPalletQuery, Statement.RETURN_GENERATED_KEYS);
+		palletStmt.execute();
 		ResultSet palletId = palletStmt.getGeneratedKeys();
 		
 		if(palletId.next()){
@@ -228,7 +224,8 @@ public class BackEnd {
 			PreparedStatement PalInBatchStmt = conn.prepareStatement(createPalletsInBatchQuery);
 			PalInBatchStmt.setInt(1,  palletNbr);
 			PalInBatchStmt.setInt(2,  batchNbr);
-			PalInBatchStmt.executeQuery();
+			PalInBatchStmt.execute();
+			System.out.println(palletNbr);
 			return palletNbr;			
 			
 			
@@ -292,7 +289,7 @@ public class BackEnd {
 		try {
 			blockBatches = conn.prepareStatement(blockBatchQuery);
 			blockBatches.setInt(1, batchNbr);
-			blockBatches.executeQuery();
+			blockBatches.execute();
 		}catch(SQLException e) {
 			System.err.println(e);
 		}
@@ -341,27 +338,18 @@ public class BackEnd {
 			getCookies = conn.prepareStatement(getCookiesQuery);
 			cookieSet = getCookies.executeQuery();
 			while(cookieSet.next()) {
-				cookies.add(cookieSet.getString(1));
+				StringBuilder sb = new StringBuilder();
+				sb.append(cookieSet.getString("cookieName"));
+				cookies.add(sb.toString());
 			}
 		}catch(SQLException e) {
 			System.err.println(e);
 		}
 		return cookies;
 	}
-
-	public ArrayList<String> getStatuses() {
-		ArrayList<String> statuses = new ArrayList<String>();
-		PreparedStatement getStatuses;
-		ResultSet statusSet;
-		try {
-			getStatuses = conn.prepareStatement(getStatusQuery);
-			statusSet = getStatuses.executeQuery();
-			while(statusSet.next()) {
-				statuses.add(statusSet.getString(1));
-			}
-		} catch(SQLException e) {
-			System.err.println(e);
-		}
-		return statuses;
+	
+	public void movePalletToStorage(int palletNbr){
+		//TODO : this should move pallets from "in production" to "in storage"
+		return;
 	}
 }
