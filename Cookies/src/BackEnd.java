@@ -28,7 +28,7 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
-	private String getStatusQuery
+	private String getStatusQuery;
 
 	public BackEnd(){
 		conn = null;
@@ -47,7 +47,7 @@ public class BackEnd {
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
 		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
-+		getStatusQuery = "select status from Pallet group by status";
+		getStatusQuery = "select status from Pallet group by status";
 
 	}
 	
