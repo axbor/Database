@@ -27,6 +27,7 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
+	private String getStatusQuery;
 
 	public BackEnd(){
 		conn = null;
@@ -45,6 +46,7 @@ public class BackEnd {
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
 		createPalletQuery = "insert into Pallets values(null, 'in production')";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
+		getStatusQuery = "select status from Pallet group by status";
 	}
 	
 	public boolean openConnection() {
@@ -339,9 +341,7 @@ public class BackEnd {
 			getCookies = conn.prepareStatement(getCookiesQuery);
 			cookieSet = getCookies.executeQuery();
 			while(cookieSet.next()) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(cookieSet.getString("cookieName"));
-				cookies.add(sb.toString());
+				cookies.add(cookieSet.getString(1));
 			}
 		}catch(SQLException e) {
 			System.err.println(e);
@@ -350,8 +350,18 @@ public class BackEnd {
 	}
 
 	public ArrayList<String> getStatuses() {
-		
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<String> statuses = new ArrayList<String>();
+		PreparedStatement getStatuses;
+		ResultSet statusSet;
+		try {
+			getStatuses = conn.prepareStatement(getStatusQuery);
+			statusSet = getStatuses.executeQuery();
+			while(statusSet.next()) {
+				statuses.add(statusSet.getString(1));
+			}
+		} catch(SQLException e) {
+			System.err.println(e);
+		}
+		return statuses;
 	}
 }

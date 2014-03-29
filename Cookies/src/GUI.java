@@ -414,8 +414,7 @@ public class GUI {
 
 		public StatusListModel(BackEnd be){
 			//TODO: implementera nedan
-//			statuses = be.getStatuses();
-			statuses.add("mår bra");
+			statuses = be.getStatuses();
 		}
 
 		@Override

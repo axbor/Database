@@ -249,3 +249,11 @@ insert into Customer(customerName, address) values('Gästkakor AB','Hässlehåla
 insert into Customer(customerName, address) values('Skånekakor AB','Perstorp');
 
 
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Småbröd AB', now(), null);
+insert into Ordering values(default, 'Skånekakor AB', now(), null);
+insert into Ordering values(default, 'Skånekakor AB', now(), null);
+
