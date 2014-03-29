@@ -37,7 +37,7 @@ public class BackEnd {
 		createBatchQuery = "insert into ProductionBatch values( default, ?, now(), 'Untested')";
 		getIngredientAmountRecipeQuery = "select amount from RawMaterial where ingredientName = ?";
 		getIngredientsQuery = "select ingredientName, amount from CookieContains where cookieName = ?";
-		updateMaterialQuery = "update RawMaterial set amount = ? where ingredientName = ?";
+		updateMaterialQuery = "update RawMaterial set amount = amount - ? where ingredientName = ?";
 		getMaterialAmountQuery = "select amount from RawMaterial where ingredientName = ?";
 		getBatchInfoQuery = "select cookieName, prodDate, QA from ProductionBatch where batchNumber = ?";
 		getPalletInfoQuery = "select orderNumber, status from Pallet where palletNumber = ?";
@@ -118,7 +118,7 @@ public class BackEnd {
 				System.out.println("Not enough material in storage");
 				return null;
 			}
-			stockAmount = stockAmount - entry.getValue();
+			stockAmount =  entry.getValue();
 			amountExists.put(entry.getKey(), stockAmount);
 		}
 		
