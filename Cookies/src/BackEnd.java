@@ -29,7 +29,7 @@ public class BackEnd {
 	private String getBlockedPalletsQuery;
 	private String setBlockedPalletsQuery;
 	private String movePalletQuery;
-
+	private String searchByStatusQuery;
 	public BackEnd(){
 		conn = null;
 		
@@ -50,6 +50,8 @@ public class BackEnd {
 		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
 		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
+		searchByStatusQuery = "select batchNumber, palletNumber, cookieName from Pallet natural join PalletsInBatch natural join productionBatch where status = ?";
+
 
 	}
 	
@@ -397,4 +399,26 @@ public class BackEnd {
  	}
  		return statuses;
   	}
+	
+	public Vector<Vector<String>> searchByStatus(String status){
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		try{
+		PreparedStatement searchStmt = conn.prepareStatement(searchByStatusQuery);
+		searchStmt.setString(1, status);
+		ResultSet searchResult = searchStmt.executeQuery();
+		int i=0;
+		while(searchResult.next()){	
+			list.get(i).add(Integer.toString(searchResult.getInt("batchNumber")));
+			list.get(i).add(Integer.toString(searchResult.getInt("palletNumber")));
+			list.get(i).add(searchResult.getString("cookieName"));
+			i++;
+		}
+		
+		}catch(SQLException e){
+			System.err.println(e);
+		}
+		
+		return list;
+	}
+	
 }
