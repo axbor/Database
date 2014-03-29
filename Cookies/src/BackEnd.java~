@@ -36,6 +36,7 @@ public class BackEnd {
 
 	private String palletExistsQuery;
 	private String getCustomersQuery;
+	private String getOrderInfoQuery;
 	
 	
 	public BackEnd(){
@@ -57,16 +58,17 @@ public class BackEnd {
 		getStatusQuery = "select status from Pallet group by status";
 		getBlockedPalletsQuery = "select palletNumber )from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
-		movePalletToStorageQuery = "update Pallet set status = 'in storage', set prodTime = now() where palletNumber = ?";
+		movePalletToStorageQuery = "update Pallet set status = 'in storage', prodTime = now() where palletNumber = ?";
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
 		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
 
-		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
+		palletExistsQuery = "select * from Pallet where palletNumber = ?";
 
 		getCustomersQuery = "select customerName from Customer";
-
+		getOrderInfoQuery = "select * from Ordering where orderNumber = ?";
+		
 	}
 	
 	public boolean openConnection() {
@@ -410,6 +412,7 @@ public class BackEnd {
 	public boolean palletExists(int palletNbr){
 		try{
 			PreparedStatement palletExists = conn.prepareStatement(palletExistsQuery);
+			palletExists.setInt(1,  palletNbr);
 			ResultSet palletExistsResult = palletExists.executeQuery();
 			if(palletExistsResult.next()){
 				return true;
@@ -537,16 +540,51 @@ public class BackEnd {
 	}
 	
 	
-	public boolean movePalletToDelivered(int palletNbr){
+	public boolean movePalletToDelivered(int orderNbr, int palletNbr){
 		
 		if(!palletExists(palletNbr)){
 			return false;
 		}
 		
+		String cookieName;
 		try{
-			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered' where palletNumber = ?");
-			movePalletStmt.setInt(1,  palletNbr);
+			
+			PreparedStatement palletOrder = conn.prepareStatement("select cookieName, nbrOfPallets from PalletOrder");
+			ResultSet palletOrders = palletOrder.executeQuery();
+			conn.setAutoCommit(false);
+			while(palletOrders.next()){
+				
+				cookieName = palletOrders.getString("cookieName");
+				int neededPallets = palletOrders.getInt("nbrOfPallets");
+				PreparedStatement countPallet = conn.prepareStatement("select count(*) from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? and status='in storage'");
+				countPallet.setString(1, cookieName);
+				ResultSet countPalletResult = countPallet.executeQuery();
+				if(countPalletResult.next()){
+					if(countPalletResult.getInt(1) < neededPallets){
+						conn.rollback();
+						return false; //not enough pallets in storage for this order!
+					}
+				} else {
+					//this shouldnt happen
+					return false;
+				}
+				
+				
+				
+			}
+			conn.commit();
+			
+			
+			
+			//update pallet with orderNbr and status
+			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered', set orderNumber = ? where palletNumber = ?");
+			movePalletStmt.setInt(2,  palletNbr);
+			movePalletStmt.setInt(1,  orderNbr);
 			movePalletStmt.execute();
+			
+			//update PalletOrder
+			PreparedStatement palletOrderStmt = conn.prepareStatement("select nbrOfPallets from PalletOrder where orderNumber = ?");
+			
 			}catch(SQLException e){
 	 			System.err.println(e);
 	 			return false;
@@ -556,7 +594,6 @@ public class BackEnd {
 	}
 	
 	
-
 
 	public ArrayList<String> getCustomers() {
 		ArrayList<String> customers = new ArrayList<String>();
@@ -573,5 +610,27 @@ public class BackEnd {
  		}
  		return customers;
   	}
+	
+	public boolean orderExist(int orderNbr) {
+		PreparedStatement checkOrders;
+		ResultSet rs;
+		try {
+			checkOrders = conn.prepareStatement(getOrderInfoQuery);
+			checkOrders.setInt(1, orderNbr);
+			rs = checkOrders.executeQuery();
+			if(!rs.next()){
+				return false;
+			}
+		}catch(SQLException e) {
+			System.err.println(e);
+		}
+		return true;
+	}
+
+	public boolean pallletInProd(int palletNbr) {
+		
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

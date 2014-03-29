@@ -486,15 +486,15 @@ public class GUI {
 						return;
 					}
 					if(!be.orderExist(orderNbr)) {
-						JOptionPane.showMessageDialog(null, "The order does not exist");
+						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
 						return;
 					}
 					//TODO: implementera den nedanför
-//					if(!be.deliverOrder(orderNbr)) {
-//						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
-//					}else {
-//						JOptionPane.showMessageDialog(null, "Order number " + orderNbr + " has been blocked");
-//					}
+					if(!be.movePalletToDelivered(orderNbr)) {
+						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
+					}else {
+						JOptionPane.showMessageDialog(null, "Order number " + orderNbr + " has been d");
+					}
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "The order number has to be a positive integer");
 				}
@@ -530,10 +530,12 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
 						return;
 					}
-					if(!be.movePalletToStorage(palletNbr)) {
+					if(!be.pallletInProd(palletNbr)) {
+						JOptionPane.showMessageDialog(null, "The pallet is not in production any more");
+					}else if(!be.movePalletToStorage(palletNbr)) {
 						JOptionPane.showMessageDialog(null, "The pallet does not exist");
 						return;
-					} else {
+					}else {
 						JOptionPane.showMessageDialog(null, "The pallet has been moved to storage");
 					}
 					
