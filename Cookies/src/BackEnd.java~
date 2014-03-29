@@ -28,7 +28,6 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
-	private String getStatusQuery
 
 	public BackEnd(){
 		conn = null;
