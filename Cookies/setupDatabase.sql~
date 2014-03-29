@@ -95,64 +95,64 @@ create table CookieContains (
 
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount)
- values('Flour', 20,  now(), 10);
+ values('Flour', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName,amount,  lastDeliveryDate, lastDeliveryAmount) 
-values('Butter', 20, now(), 10);
+values('Butter', 20000, now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Icing sugar', 20, now(), 10);
+values('Icing sugar', 20000, now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Roasted, chopped nuts', 20,  now(), 10);
+values('Roasted, chopped nuts', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Ground, roasted nuts', 20,  now(), 10);
+values('Ground, roasted nuts', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Fine-ground nuts', 20,  now(), 10);
+values('Fine-ground nuts', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Bread crumbs', 20,  now(), 10);
+values('Bread crumbs', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Sugar', 20,  now(), 10);
+values('Sugar', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Egg whites', 20,  now(), 10);
+values('Egg whites', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Chocolate', 20,  now(), 10);
+values('Chocolate', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Marzipan', 20,  now(), 10);
+values('Marzipan', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Egg', 20,  now(), 10);
+values('Egg', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Potato starch', 20,  now(), 10);
+values('Potato starch', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Wheat flour', 20,  now(), 10);
+values('Wheat flour', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Sodium bicarbonate', 20,  now(), 10);
+values('Sodium bicarbonate', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Vanilla', 20,  now(), 10);
+values('Vanilla', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Chopped almonds', 20,  now(), 10);
+values('Chopped almonds', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Cinnamon', 20,  now(), 10);
+values('Cinnamon', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Vanilla sugar', 20,  now(), 10);
+values('Vanilla sugar', 20000,  now(), 10);
 
 insert into RawMaterial(ingredientName, amount, lastDeliveryDate, lastDeliveryAmount) 
-values('Eggs', 20,  now(), 10);
+values('Eggs', 20000,  now(), 10);
 
 
 -- Insert into Recipe
@@ -248,4 +248,12 @@ insert into Customer(customerName, address) values('Partykakor AB','Kristianstad
 insert into Customer(customerName, address) values('Gästkakor AB','Hässlehåla');
 insert into Customer(customerName, address) values('Skånekakor AB','Perstorp');
 
+
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), null);
+insert into Ordering values(default, 'Småbröd AB', now(), null);
+insert into Ordering values(default, 'Skånekakor AB', now(), null);
+insert into Ordering values(default, 'Skånekakor AB', now(), null);
 

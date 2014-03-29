@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import javax.print.DocFlavor.READER;
 
 
 
@@ -16,9 +15,7 @@ public class BackEnd {
 
 	private Connection conn;
 	private String createPalletQuery;
-	private String getNbrOfBatchesQuery;
 	private String createBatchQuery;
-	private String getIngredientAmountRecipeQuery;
 	private String getIngredientsQuery;
 	private String updateMaterialQuery;
 	private String getMaterialAmountQuery;
@@ -29,6 +26,9 @@ public class BackEnd {
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
 	private String getStatusQuery;
+	private String getBlockedPalletsQuery;
+	private String setBlockedPalletsQuery;
+	private String movePalletQuery;
 
 	public BackEnd(){
 		conn = null;
@@ -36,7 +36,6 @@ public class BackEnd {
 //		createPalletQuery = "Insert into Pallets values (null,?,created)";
 //		getNbrOfBatchesQuery = "select ";
 		createBatchQuery = "insert into ProductionBatch values( default, ?, now(), 'Untested')";
-		getIngredientAmountRecipeQuery = "select amount from RawMaterial where ingredientName = ?";
 		getIngredientsQuery = "select ingredientName, amount from CookieContains where cookieName = ?";
 		updateMaterialQuery = "update RawMaterial set amount = amount - ? where ingredientName = ?";
 		getMaterialAmountQuery = "select amount from RawMaterial where ingredientName = ?";
@@ -48,6 +47,9 @@ public class BackEnd {
 		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
 		getStatusQuery = "select status from Pallet group by status";
+		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
+		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
+		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
 
 	}
 	
@@ -229,8 +231,7 @@ public class BackEnd {
 			PalInBatchStmt.setInt(2,  batchNbr);
 			PalInBatchStmt.execute();
 			System.out.println(palletNbr);
-			return palletNbr;			
-			
+			return palletNbr;					
 			
 		}
 		} catch(SQLException e) {
@@ -284,19 +285,38 @@ public class BackEnd {
 		return sb.toString();
 	}
 
-	public boolean blockBatch(int batchNbr) {
+	public ArrayList<Integer> blockBatch(int batchNbr) {
 		PreparedStatement blockBatches;
+		ArrayList<Integer> blockedPalletsNbr = new ArrayList<Integer>();
+
 		if(!batchExist(batchNbr)) {
-			return false;
+			return null;
 		}
 		try {
 			blockBatches = conn.prepareStatement(blockBatchQuery);
 			blockBatches.setInt(1, batchNbr);
 			blockBatches.execute();
+		
+		
+		PreparedStatement blockPalletsNbr = conn.prepareStatement(getBlockedPalletsQuery);
+		blockPalletsNbr.setInt(1, batchNbr);
+		ResultSet blockResult = blockPalletsNbr.executeQuery();
+		while(blockResult.next()){
+			blockedPalletsNbr.add(blockResult.getInt(1));
+		}
+		
+		PreparedStatement blockPallets = conn.prepareStatement(setBlockedPalletsQuery);
+		for(int palletNbr : blockedPalletsNbr){
+			blockPallets.setInt(1,  palletNbr);
+			blockPallets.executeUpdate();
+		}
+		
+		
 		}catch(SQLException e) {
 			System.err.println(e);
 		}
-		return true;
+		return blockedPalletsNbr;
+
 	}
 
 	private boolean batchExist(int batchNbr) {
@@ -349,9 +369,17 @@ public class BackEnd {
 		return cookies;
 	}
 	
-	public void movePalletToStorage(int palletNbr){
-		//TODO : this should move pallets from "in production" to "in storage"
-		return;
+	public boolean movePalletToStorage(int palletNbr){
+		try{
+		PreparedStatement movePalletStmt = conn.prepareStatement(movePalletQuery);
+		movePalletStmt.setInt(1,  palletNbr);
+		movePalletStmt.execute();
+		}catch(SQLException e){
+ 			System.err.println(e);
+ 			return false;
+		}
+		
+		return true;
 	}
 
 	public ArrayList<String> getStatuses() {
