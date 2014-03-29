@@ -348,4 +348,10 @@ public class BackEnd {
 		}
 		return cookies;
 	}
+
+	public ArrayList<String> getStatuses() {
+		
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

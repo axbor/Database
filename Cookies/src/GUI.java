@@ -33,6 +33,7 @@ public class GUI {
 	private JTextField startDate;
 	private JTextField endDate;
 	private JTable timeTable;
+	private JTextField deliverTextField;
 
 	/**
 	 * Create a GUI object and connect to the database.
@@ -52,7 +53,7 @@ public class GUI {
 		frame.getContentPane().add(tabbedPane_1, BorderLayout.CENTER);
 
 		JPanel createPanel = new JPanel();
-		tabbedPane_1.addTab("Create", null, createPanel, null);
+		tabbedPane_1.addTab("Create pallet", null, createPanel, null);
 		createPanel.setLayout(null);
 
 		list = new JList<String>();
@@ -173,8 +174,8 @@ public class GUI {
 		searchPane.addTab("By time", null, searchTimepanel, null);
 		searchTimepanel.setLayout(null);
 		
-		JLabel lblEnterTheTime = new JLabel("Enter the time interval you want to search pallets for");
-		lblEnterTheTime.setBounds(145, 25, 377, 15);
+		JLabel lblEnterTheTime = new JLabel("Enter the production time interval you want to search pallets for");
+		lblEnterTheTime.setBounds(89, 25, 504, 15);
 		searchTimepanel.add(lblEnterTheTime);
 		
 		JLabel lblNewLabel_1 = new JLabel("Start date");
@@ -269,7 +270,7 @@ public class GUI {
 
 
 		JPanel blockingPanel = new JPanel();
-		tabbedPane_1.addTab("Blocking", null, blockingPanel, null);
+		tabbedPane_1.addTab("Block batch", null, blockingPanel, null);
 		blockingPanel.setLayout(null);
 		
 		
@@ -307,6 +308,46 @@ public class GUI {
 		JLabel lblNewLabel = new JLabel("Enter number of the batch that did not pass the QA test");
 		lblNewLabel.setBounds(152, 104, 424, 15);
 		blockingPanel.add(lblNewLabel);
+		
+		// BLOCKING PANEL ////////////////////////////
+		
+		
+		JPanel deliverPanel = new JPanel();
+		tabbedPane_1.addTab("Deliver order", null, deliverPanel, null);
+		deliverPanel.setLayout(null);
+		
+		JLabel lblEnterTheOrder = new JLabel("Enter the order number you want to deliver to the customer ");
+		lblEnterTheOrder.setBounds(136, 43, 429, 15);
+		deliverPanel.add(lblEnterTheOrder);
+		
+		deliverTextField = new JTextField();
+		deliverTextField.setBounds(277, 125, 114, 19);
+		deliverPanel.add(deliverTextField);
+		deliverTextField.setColumns(10);
+		
+		JButton btnDeliver = new JButton("Deliver");
+		btnDeliver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String text = deliverTextField.getText();
+				try{
+					int orderNbr = Integer.parseInt(text);
+					if(orderNbr < 1) {
+						JOptionPane.showMessageDialog(null, "The order number has to be a positive integer");
+						return;
+					}
+					//TODO: implementera den nedanför
+//					if(!be.deliverOrder(orderNbr)) {
+//						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
+//					}else {
+//						JOptionPane.showMessageDialog(null, "Order number " + orderNbr + " has been blocked");
+//					}
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "The order number has to be a positive integer");
+				}
+			}
+		});
+		btnDeliver.setBounds(274, 250, 117, 25);
+		deliverPanel.add(btnDeliver);
 
 
 		
