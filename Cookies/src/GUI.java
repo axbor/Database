@@ -134,17 +134,34 @@ public class GUI {
 		searchPane.addTab("By status", null, searchStatuspanel, null);
 		searchStatuspanel.setLayout(null);
 		
-		JList<String> statusList = new JList<String>();
+		final JList<String> statusList = new JList<String>();
 		statusList.setModel(new StatusListModel(be));
 		statusList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		statusList.setBounds(12, 49, 148, 364);
 		searchStatuspanel.add(statusList);
-		
-		JButton button_3 = new JButton("OK");
+
+		Object[][] statusInfo = ;
+		JButton button_3 = new JButton("Search");
+		button_3.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try{
+					int index = statusList.getSelectedIndex();
+					ListModel<String> model = statusList.getModel();
+					String status = model.getElementAt(index);
+					//TODO: fortsätt här
+//					int palletNbr = be.createBatch(cookie, amount);
+//					JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
+//					palletNbr + " - " + (palletNbr+amount));
+				}catch(NumberFormatException err) {
+					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
+				}
+			}
+		});
 		button_3.setBounds(172, 226, 117, 25);
 		searchStatuspanel.add(button_3);
 		
-		table_2 = new JTable();
+		String[] searchColumns = {"Pallet number", "Batch Number", "Cookie", "Status"};
+		table_2 = new JTable(data, searchColumns);
 		table_2.setBounds(313, 67, 327, 346);
 		searchStatuspanel.add(table_2);
 		
