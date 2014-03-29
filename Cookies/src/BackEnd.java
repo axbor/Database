@@ -257,13 +257,22 @@ public class BackEnd {
 			batchInfoSet = getBatchInfo.executeQuery();
 			batchInfoSet.next();
 			sb.append("Batch number" + batchNbr + " has ");
-			sb.append(batchInfoSet.getString("cookieName") + " and was produced on ");
-			sb.append(batchInfoSet.getString("prodDate") + " and has the QA result: ");
-			sb.append(batchInfoSet.getString("QA"));
+			sb.append(batchInfoSet.getString("cookieName") + ". " + "\n");
+			sb.append("It was produced on " + batchInfoSet.getString("prodDate") + " and has the QA result: ");
+			sb.append(batchInfoSet.getString("QA") + "\n");
+			sb.append(getPalletsInBatch(batchNbr));
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
 		return sb.toString();
+	}
+
+	private String getPalletsInBatch(int batchNbr) {
+		PreparedStatement getPallets;
+		ResultSet rs;
+		StringBuilder sb = new StringBuilder();
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public String getPalletInfo(int palletNbr) {
