@@ -81,9 +81,20 @@ public class GUI {
 						int index = list.getSelectedIndex();
 						ListModel<String> model = list.getModel();
 						String cookie = model.getElementAt(index);
-						int palletNbr = be.createBatch(cookie, amount);
+						ArrayList<Integer> palletNbrs = be.createBatch(cookie, amount);
+				
+						StringBuilder sb = new StringBuilder();
+						sb.append("\n");
+						for(int nbr : palletNbrs){
+							
+							sb.append(nbr);
+							sb.append("\n");
+							
+						}
+						String pallets = sb.toString();
+						
 						JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
-						palletNbr + " - " + (palletNbr+amount));
+						pallets);
 					}
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
