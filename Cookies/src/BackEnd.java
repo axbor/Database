@@ -26,6 +26,7 @@ public class BackEnd {
 	private String getBatchesQuery;
 	private String getCookiesQuery;
 	private String blockBatchQuery;
+	private String createPalletsInBatchQuery;
 
 	public BackEnd(){
 		conn = null;
@@ -43,6 +44,7 @@ public class BackEnd {
 		getCookiesQuery = "select cookieName from Recipe";
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
 		createPalletQuery = "insert into Pallets values(null, 'in production')";
+		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
 	}
 	
 	public boolean openConnection() {
@@ -108,8 +110,10 @@ public class BackEnd {
 		ArrayList<String> ingredientList = getIngredients(cookieName);
 		HashMap<String ,Double> amountExists = new HashMap<String, Double>();
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
+		int batchNbr;
 		try {
-			for(int i = 0; i < ingredientList.size(); i ++) {
+			// getting required amount for the specified recipe, also checking that it's available
+			for(int i = 0; i < ingredientList.size(); i ++) { 
 				getIngredientAmount = conn.prepareStatement(getIngredientAmountRecipeQuery);
 				getIngredientAmount.setString(1, ingredientList.get(i));
 				amountSet = getIngredientAmount.executeQuery();
@@ -123,22 +127,36 @@ public class BackEnd {
 				}
 			}
 			
-			//skapa batch
+			//creates the batch
 			createBatch = conn.prepareStatement(createBatchQuery);
 			createBatch.executeQuery();
+			ResultSet batchResult = createBatch.getGeneratedKeys();
 			
+			if(batchResult.next()){
+				batchNbr = batchResult.getInt(1);
+				//creates the pallets for the specified batch
+				for(int i = 0; i < nbrOfPallets ; i++){
+					palletList.add(createPallet(cookieName, batchNbr));
+				}
+			}
+			
+			
+			//updates the amount of raw material
 			for(int i = 0; i < ingredientList.size(); i ++) {
 				double amount = amountExists.get(i);
 				updateRawMaterial(ingredientList.get(i), amount*54*nbrOfPallets);
+				
+				
 			}
+			
+			
+
 		}catch(SQLException e) {
 			System.err.println(e);
 			return null;
 		}
 		
-		for(int i = 0; i < nbrOfPallets ; i++){
-			palletList.add(createPallet(cookieName));
-		}
+		
 		
 		
 		return palletList;
@@ -195,7 +213,7 @@ public class BackEnd {
 		}
 	}
 	
-	public int createPallet(String recipe){
+	public int createPallet(String recipe, int batchNbr){
 		try{
 		
 		PreparedStatement palletStmt = conn.prepareStatement(createPalletQuery);
@@ -203,7 +221,15 @@ public class BackEnd {
 		ResultSet palletId = palletStmt.getGeneratedKeys();
 		
 		if(palletId.next()){
-			return palletId.getInt(1);
+			int palletNbr = palletId.getInt(1);
+			
+			PreparedStatement PalInBatchStmt = conn.prepareStatement(createPalletsInBatchQuery);
+			PalInBatchStmt.setInt(1,  palletNbr);
+			PalInBatchStmt.setInt(2,  batchNbr);
+			PalInBatchStmt.executeQuery();
+			return palletNbr;			
+			
+			
 		}
 		} catch(SQLException e) {
 			System.err.println(e);
