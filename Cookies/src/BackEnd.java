@@ -406,12 +406,12 @@ public class BackEnd {
 		PreparedStatement searchStmt = conn.prepareStatement(searchByStatusQuery);
 		searchStmt.setString(1, status);
 		ResultSet searchResult = searchStmt.executeQuery();
-		int i=0;
-		while(searchResult.next()){	
-			list.get(i).add(Integer.toString(searchResult.getInt("batchNumber")));
-			list.get(i).add(Integer.toString(searchResult.getInt("palletNumber")));
-			list.get(i).add(searchResult.getString("cookieName"));
-			i++;
+		while(searchResult.next()){
+			Vector<String> row = new Vector<String>();
+			row.add(Integer.toString(searchResult.getInt("batchNumber")));
+			row.add(Integer.toString(searchResult.getInt("palletNumber")));
+			row.add(searchResult.getString("cookieName"));
+			list.add(row);
 		}
 		
 		}catch(SQLException e){
