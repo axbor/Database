@@ -1,10 +1,14 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import javax.xml.stream.Location;
 
 /**
@@ -151,7 +155,7 @@ public class GUI {
 		statusList.setBounds(12, 49, 148, 364);
 		searchStatuspanel.add(statusList);
 
-		Object[][] statusInfo = {{"1","1","kaka","bra"},{"1","1","kaka","bra"}};
+		DefaultTableModel dtm = new DefaultTableModel();
 		JButton button_3 = new JButton("Search");
 		button_3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -159,6 +163,7 @@ public class GUI {
 					int index = statusList.getSelectedIndex();
 					ListModel<String> model = statusList.getModel();
 					String status = model.getElementAt(index);
+					table_2 = new JTable(buildStatusTableModel(status));
 					//TODO: fortsätt här
 //					int palletNbr = be.createBatch(cookie, amount);
 //					JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
@@ -167,15 +172,22 @@ public class GUI {
 					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
 				}
 			}
+
+			private TableModel buildStatusTableModel(String status) {
+				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Pallet Id");
+				columnNames.add("Batch Id");
+				columnNames.add("Cookie");
+				Vector<Vector<String>> data = be.getStatusData(status);
+				return null;
+			}
 		});
 		button_3.setBounds(172, 226, 117, 25);
 		searchStatuspanel.add(button_3);
 		
-		String[] searchColumns = {"Pallet number", "Batch Number", "Cookie", "Status"};
-//		TableModel statusTableModel = new Ta
-		table_2 = new JTable(statusInfo, searchColumns);
-		table_2.setBounds(313, 29, 363, 384);
-		searchStatuspanel.add(table_2);
+		JScrollPane scrollStatusPane = new JScrollPane(table_2);
+		searchStatuspanel.add(scrollStatusPane);
+		scrollStatusPane.setBounds(313, 29, 363, 384);
 		
 		//search delivery Tab /////////////////////////
 		
