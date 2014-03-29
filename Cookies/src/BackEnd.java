@@ -53,8 +53,8 @@ public class BackEnd {
 		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
 		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
-		searchByStatusQuery = "select batchNumber, palletNumber, cookieName from Pallet natural join PalletsInBatch natural join productionBatch where status = ?";
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
+		searchByStatusQuery = "select batchNumber, palletNumber, cookieName from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 
 	}
 	
