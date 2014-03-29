@@ -172,8 +172,9 @@ public class GUI {
 		searchStatuspanel.add(button_3);
 		
 		String[] searchColumns = {"Pallet number", "Batch Number", "Cookie", "Status"};
+//		TableModel statusTableModel = new Ta
 		table_2 = new JTable(statusInfo, searchColumns);
-		table_2.setBounds(313, 67, 327, 346);
+		table_2.setBounds(313, 29, 363, 384);
 		searchStatuspanel.add(table_2);
 		
 		//search delivery Tab /////////////////////////
@@ -442,7 +443,7 @@ public class GUI {
 
 		public StatusListModel(BackEnd be){
 			//TODO: implementera nedan
-			statuses = be.getStatuses();
+//			statuses = be.getStatuses();
 		}
 
 		@Override
