@@ -3,7 +3,7 @@
 -- arbitrary order.
 set foreign_key_checks = 0;
 
-drop table if exists BatchesInPallet;
+drop table if exists PalletsInBatch;
 drop table if exists OrdersInShipment;
 drop table if exists PalletOrder;
 drop table if exists CookieContains;
@@ -28,8 +28,9 @@ create table Customer (
 create table Ordering (
 	orderNumber int auto_increment,
 	customerName varchar(50),
-	orderDate date,
-	deliveryDate date,
+	orderDate datetime,
+	expectedDeliverDate date,
+	deliveryDate datetime,
 	primary key(orderNumber),
 	foreign key(customerName) references Customer(customerName)
 );
@@ -43,6 +44,7 @@ create table Pallet(
 	palletNumber int auto_increment,
 	orderNumber int,
 	status varchar(50),
+	prodTime dateTime,
 	primary key(palletNumber),
 	foreign key(orderNumber) references Ordering(orderNumber)
 );
@@ -58,13 +60,13 @@ create table RawMaterial (
 create table ProductionBatch(
 	batchNumber int auto_increment, 
 	cookieName varchar(50), 
-	prodDate date, 
+	prodDate datetime, 
 	QA varchar(50),
 	primary key(batchNumber),
 	foreign key(cookieName) references Recipe(cookieName)
 );
 
-create table BatchesInPallet(
+create table PalletsInBatch(
 	palletNumber int,
 	batchNumber int,
 	primary key(palletNumber, batchNumber),
@@ -76,6 +78,7 @@ create table PalletOrder (
 	orderNumber int,
 	cookieName varchar(50),
 	nbrOfPallets int,
+	
 	primary key(orderNumber, cookieName),
 	foreign key(orderNumber) references Ordering(orderNumber),
 	foreign key(cookieName) references Recipe(cookieName)
@@ -249,11 +252,32 @@ insert into Customer(customerName, address) values('Gästkakor AB','Hässlehåla
 insert into Customer(customerName, address) values('Skånekakor AB','Perstorp');
 
 
-insert into Ordering values(default, 'Finkakor AB', now(), null);
-insert into Ordering values(default, 'Finkakor AB', now(), null);
-insert into Ordering values(default, 'Finkakor AB', now(), null);
-insert into Ordering values(default, 'Finkakor AB', now(), null);
-insert into Ordering values(default, 'Småbröd AB', now(), null);
-insert into Ordering values(default, 'Skånekakor AB', now(), null);
-insert into Ordering values(default, 'Skånekakor AB', now(), null);
+insert into Ordering values(default, 'Finkakor AB', now(), '2014-04-03', null );
+insert into PalletOrder values(1, 'Tango', 5);
+insert into PalletOrder values(1, 'Berliner', 5);
+insert into PalletOrder values(1, 'Nut ring', 5);
+insert into Ordering values(default, 'Finkakor AB', now(), '2014-04-04', null);
+insert into PalletOrder values(2, 'Tango', 5);
+insert into PalletOrder values(2, 'Berliner', 5);
+insert into PalletOrder values(2, 'Nut ring', 5);
+insert into Ordering values(default, 'Finkakor AB', now(), '2014-04-05', null);
+insert into PalletOrder values(3, 'Tango', 5);
+insert into PalletOrder values(3, 'Berliner', 5);
+insert into PalletOrder values(3, 'Nut ring', 5);
+insert into Ordering values(default, 'Finkakor AB', now(), '2014-04-06', null);
+insert into PalletOrder values(4, 'Tango', 5);
+insert into PalletOrder values(4, 'Berliner', 5);
+insert into PalletOrder values(4, 'Nut ring', 5);
+insert into Ordering values(default, 'Småbröd AB', now(), '2014-04-07', null);
+insert into PalletOrder values(5, 'Tango', 5);
+insert into PalletOrder values(5, 'Berliner', 5);
+insert into PalletOrder values(5, 'Amneris', 5);
+insert into Ordering values(default, 'Skånekakor AB', now(), '2014-04-08', null);
+insert into PalletOrder values(6, 'Tango', 5);
+insert into PalletOrder values(6, 'Amneris', 5);
+insert into PalletOrder values(6, 'Nut ring', 5);
+insert into Ordering values(default, 'Skånekakor AB', now(), '2014-04-09', null);
+insert into PalletOrder values(7, 'Amneris', 5);
+insert into PalletOrder values(7, 'Berliner', 5);
+insert into PalletOrder values(7, 'Nut ring', 5);
 

@@ -28,12 +28,13 @@ public class BackEnd {
 	private String getStatusQuery;
 	private String getBlockedPalletsQuery;
 	private String setBlockedPalletsQuery;
-	private String movePalletQuery;
+	private String movePalletToStorageQuery;
 	private String searchByStatusQuery;
 	private String getPalletsInBatchQuery; 
 	private String searchByCookieQuery;
 	private String searchByDateQuery;
-
+	private String searchByCustomerQuery;
+	private String palletExistsQuery;
 	
 	
 	public BackEnd(){
@@ -50,16 +51,18 @@ public class BackEnd {
 		getBatchesQuery = "select batchNumber, cookieName from ProductionBatch";
 		getCookiesQuery = "select cookieName from Recipe";
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
-		createPalletQuery = "insert into Pallet values(default, null, 'in production')";
+		createPalletQuery = "insert into Pallet values(default, null, 'in production', null)";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
 		getStatusQuery = "select status from Pallet group by status";
-		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
+		getBlockedPalletsQuery = "select palletNumber )from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
-		movePalletQuery = "update Pallets set status = 'in storage' where palletNumber = ?";
+		movePalletToStorageQuery = "update Pallet set status = 'in storage', set prodTime = now() where palletNumber = ?";
 		getPalletsInBatchQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		searchByStatusQuery = "select batchNumber, palletNumber, cookieName, QA from Pallet natural join PalletsInBatch natural join productionBatch where status = ? order by batchNumber, palletNumber";
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
 		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
+		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
+		//searchByCustomerQuery = ""
 	}
 	
 	public boolean openConnection() {
@@ -250,8 +253,6 @@ public class BackEnd {
 		return -1 ;
 	}
 
-
-
 	public String getBatchInfo(int batchNbr) {
 		PreparedStatement getBatchInfo;
 		ResultSet batchInfoSet;
@@ -387,6 +388,7 @@ public class BackEnd {
 	}
 
 	public ArrayList<String> getCookies() {
+
 		PreparedStatement getCookies;
 		ResultSet cookieSet;
 		ArrayList<String> cookies = new ArrayList<String>();
@@ -402,9 +404,27 @@ public class BackEnd {
 		return cookies;
 	}
 	
-	public boolean movePalletToStorage(int palletNbr){
+	public boolean palletExists(int palletNbr){
 		try{
-		PreparedStatement movePalletStmt = conn.prepareStatement(movePalletQuery);
+			PreparedStatement palletExists = conn.prepareStatement(palletExistsQuery);
+			ResultSet palletExistsResult = palletExists.executeQuery();
+			if(palletExistsResult.next()){
+				return true;
+			}
+		}catch(SQLException e){
+			System.err.print(e);
+		}
+		return false;
+
+	}
+	public boolean movePalletToStorage(int palletNbr){
+		
+		if(!palletExists(palletNbr)){
+			return false;
+		}
+		
+		try{
+		PreparedStatement movePalletStmt = conn.prepareStatement(movePalletToStorageQuery);
 		movePalletStmt.setInt(1,  palletNbr);
 		movePalletStmt.execute();
 		}catch(SQLException e){
@@ -502,6 +522,34 @@ public class BackEnd {
 		}
 		
 		return list;
+	}
+	
+	
+	public Vector<Vector<String>> searchByCustomer(String customer){
+		
+		Vector<Vector<String>> list = new Vector<Vector<String>>();
+		// TODO: impement this
+		return list;
+		
+	}
+	
+	
+	public boolean movePalletToDelivered(int palletNbr){
+		
+		if(!palletExists(palletNbr)){
+			return false;
+		}
+		
+		try{
+			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered' where palletNumber = ?");
+			movePalletStmt.setInt(1,  palletNbr);
+			movePalletStmt.execute();
+			}catch(SQLException e){
+	 			System.err.println(e);
+	 			return false;
+			}
+			
+			return true;
 	}
 	
 	
