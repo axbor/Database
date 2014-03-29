@@ -64,7 +64,7 @@ public class BackEnd {
 		searchByCookieQuery = "select batchNumber, palletNumber, status, QA from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? order by batchNumber, palletNumber";
 		searchByDateQuery = "select batchNumber, palletNumber, cookieName, status, QA, prodDate from Pallet natural join PalletsInBatch natural join productionBatch where prodDate > ? and prodDate < ? order by batchNumber, palletNumber";
 
-		palletExistsQuery = "select * from Pallet where palletNumber = palletNbr";
+		palletExistsQuery = "select * from Pallet where palletNumber = ?";
 
 		getCustomersQuery = "select customerName from Customer";
 		getOrderInfoQuery = "select orderNumber from Ordering";
@@ -412,6 +412,7 @@ public class BackEnd {
 	public boolean palletExists(int palletNbr){
 		try{
 			PreparedStatement palletExists = conn.prepareStatement(palletExistsQuery);
+			palletExists.setInt(1,  palletNbr);
 			ResultSet palletExistsResult = palletExists.executeQuery();
 			if(palletExistsResult.next()){
 				return true;
@@ -539,16 +540,29 @@ public class BackEnd {
 	}
 	
 	
-	public boolean movePalletToDelivered(int palletNbr){
+	public boolean movePalletToDelivered(int orderNbr, int palletNbr){
 		
 		if(!palletExists(palletNbr)){
 			return false;
 		}
 		
+		int neededPallets;
+		String cookieName;
 		try{
-			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered' where palletNumber = ?");
-			movePalletStmt.setInt(1,  palletNbr);
+			
+		
+			
+			
+			
+			//update pallet with orderNbr and status
+			PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered', set orderNumber = ? where palletNumber = ?");
+			movePalletStmt.setInt(2,  palletNbr);
+			movePalletStmt.setInt(1,  orderNbr);
 			movePalletStmt.execute();
+			
+			//update PalletOrder
+			PreparedStatement palletOrderStmt = conn.prepareStatement("select nbrOfPallets from PalletOrder where orderNumber = ?");
+			
 			}catch(SQLException e){
 	 			System.err.println(e);
 	 			return false;
