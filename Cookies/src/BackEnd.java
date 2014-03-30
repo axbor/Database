@@ -154,6 +154,7 @@ public class BackEnd {
 			}
 			sb.append("\nIt's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
 			}
+			sb.append("\nIt contains " + palletInfoSet.getString("cookieName") + " and the QA-result " + palletInfoSet.getString("QA"));
 		} catch(SQLException e) {
 			System.err.println(e);
 		}
