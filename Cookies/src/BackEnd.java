@@ -370,7 +370,6 @@ public class BackEnd {
 				row.add(Integer.toString(searchResult.getInt("orderNumber")));
 				row.add(Integer.toString(searchResult.getInt("palletNumber")));
 				row.add(searchResult.getTimestamp("deliveryDate").toString());
-				row.add(searchResult.getString("cookieName"));
 				list.add(row);
 			}
 			
