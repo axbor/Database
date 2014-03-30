@@ -415,7 +415,6 @@ public class BackEnd {
 					palletCount++;
 				}
 				if (palletCount < neededPallets){
-					System.out.println("not enough pallets of " + cookieName);
 					conn.rollback();
 					return null;
 				}
@@ -637,7 +636,6 @@ public class BackEnd {
 			PalInBatchStmt.setInt(1,  palletNbr);
 			PalInBatchStmt.setInt(2,  batchNbr);
 			PalInBatchStmt.execute();
-			System.out.println(palletNbr);
 			return palletNbr;					
 			
 		}
