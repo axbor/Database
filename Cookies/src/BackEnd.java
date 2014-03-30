@@ -3,13 +3,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Vector;
 
-
-
-
-
-
 public class BackEnd {
-
 
 	private Connection conn;
 	private String createPalletQuery;
@@ -20,7 +14,6 @@ public class BackEnd {
 	private String getCookiesQuery;
 	private String blockBatchQuery;
 	private String createPalletsInBatchQuery;
-	private String getStatusQuery;
 	private String getBlockedPalletsQuery;
 	private String setBlockedPalletsQuery;
 	private String movePalletToStorageQuery;
@@ -40,7 +33,6 @@ public class BackEnd {
 	private String deletePalletOrderQuery;
 	private String updateOrderingQuery;
 	private String getPalletStatusInfoQuery;
-
 	private String checkBatchQuery;
 	private String getPassPalletQuery;
 	private String setPassedQuery;
@@ -50,7 +42,6 @@ public class BackEnd {
 	public BackEnd(){
 		conn = null;
 		
-
 		createBatchQuery = "insert into ProductionBatch values( default, ?, now(), 'Untested')";
 		getBatchInfoQuery = "select cookieName, prodDate, QA from ProductionBatch where batchNumber = ?";
 		getPalletInfoQuery = "select batchNumber, orderNumber, status, cookieName, prodDate, QA  from Pallet natural join PalletsInBatch natural join productionBatch where palletNumber = ?";
@@ -59,7 +50,6 @@ public class BackEnd {
 		blockBatchQuery = "update productionBatch set QA = 'blocked' where batchNumber = ?";
 		createPalletQuery = "insert into Pallet values(default, null, 'in production', null)";
 		createPalletsInBatchQuery = "insert into PalletsInBatch values(?,?)";
-		getStatusQuery = "select status from Pallet group by status";
 		getBlockedPalletsQuery = "select palletNumber from PalletsInBatch where batchNumber = ?";
 		setBlockedPalletsQuery = "update Pallet set status = 'blocked' where palletNumber = ?";
 		movePalletToStorageQuery = "update Pallet set status = 'in storage', prodTime = now() where palletNumber = ?";
@@ -202,22 +192,6 @@ public class BackEnd {
 		}
 		return cookies;
 	}
-	
-	public ArrayList<String> getStatuses() {
- 		ArrayList<String> statuses = new ArrayList<String>();
- 		PreparedStatement getStatuses;
- 		ResultSet statusSet;
- 		try {
- 		getStatuses = conn.prepareStatement(getStatusQuery);
- 			statusSet = getStatuses.executeQuery();
- 			while(statusSet.next()) {
- 				statuses.add(statusSet.getString(1));
- 		}
- 		} catch(SQLException e) {
- 			System.err.println(e);
- 	}
- 		return statuses;
-  	}
 	
 	public ArrayList<String> getCustomers() {
 		ArrayList<String> customers = new ArrayList<String>();
@@ -663,9 +637,5 @@ public class BackEnd {
 		}
 		return -1 ;
 	}
-		
-	
-	
-	
-		
+				
 }
