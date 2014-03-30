@@ -32,7 +32,16 @@ public class BackEnd {
 	private String palletExistsQuery;
 	private String getCustomersQuery;
 	private String getOrderInfoQuery;
-	
+	private String getAmountQuery;
+	private String updateRawMaterialQuery;
+	private String getCustomerOrderQuery;
+	private String getPalletOrderInfoQuery;
+	private String getPalletNumberQuery;
+	private String updateMovePalletQuery;
+	private String deletePalletOrderQuery;
+	private String updateOrderingQuery;
+	private String getPalletStatusInfoQuery;
+
 	
 	public BackEnd(){
 		conn = null;
@@ -57,6 +66,17 @@ public class BackEnd {
 		palletExistsQuery = "select * from Pallet where palletNumber = ?";
 		getCustomersQuery = "select customerName from Customer";
 		getOrderInfoQuery = "select * from Ordering where orderNumber = ?";
+		getAmountQuery = "select RawMaterial.amount, cookieContains.amount, RawMaterial.ingredientName from RawMaterial join cookieContains where cookieContains.cookieName = ? and RawMaterial.ingredientName = cookieContains.ingredientName;";
+		updateRawMaterialQuery = "update Rawmaterial set amount = amount - ? where ingredientName = ?";
+		getCustomerOrderQuery = "select orderNumber, palletNumber, deliveryDate from Ordering natural join Pallet where customerName = ?";
+		getPalletOrderInfoQuery = "select cookieName, nbrOfPallets from PalletOrder where orderNumber = ?";
+		getPalletNumberQuery = "select palletNumber from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? and status='in storage' and QA = 'passed'";
+		updateMovePalletQuery = "update Pallet set status = 'delivered', orderNumber = ? where palletNumber = ?";
+		deletePalletOrderQuery = "delete from PalletOrder where orderNumber = ? and cookieName = ?";
+		updateOrderingQuery = "update Ordering set deliveryDate = now() where orderNumber = ? ";
+		getPalletStatusInfoQuery = "select * from Pallet where status = 'in production' and palletNumber = ?";
+
+
 		//TODO : flytta upp queries hit ?
 	}
 	
@@ -90,26 +110,6 @@ public class BackEnd {
 
 	public boolean isConnected() {
 		return conn != null;
-	}
-	
-	public Vector<String> getRecipes(){
-		
-		Vector<String> recList = new Vector<String>();
-
-		try {
-			PreparedStatement getRec;
-			ResultSet recipes;
-			getRec = conn.prepareStatement("select cookieName from Recipe");
-			recipes = getRec.executeQuery();
-			while(recipes.next()){
-				recList.add(recipes.getString("cookieName"));
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
- 
-		return recList;
-		
 	}
 	
 	public String getBatchInfo(int batchNbr) {
@@ -236,7 +236,7 @@ public class BackEnd {
 		try {
 			conn.setAutoCommit(false);
 			
-			PreparedStatement getAmounts = conn.prepareStatement("select RawMaterial.amount, cookieContains.amount, RawMaterial.ingredientName from RawMaterial join cookieContains where cookieContains.cookieName = ? and RawMaterial.ingredientName = cookieContains.ingredientName;");
+			PreparedStatement getAmounts = conn.prepareStatement(getAmountQuery);
 			getAmounts.setString(1, cookieName);
 			ResultSet amounts = getAmounts.executeQuery();
 			
@@ -247,7 +247,7 @@ public class BackEnd {
 					conn.rollback();
 					return null;
 				}
-				PreparedStatement updateStock = conn.prepareStatement("update Rawmaterial set amount = amount - ? where ingredientName = ?");
+				PreparedStatement updateStock = conn.prepareStatement(updateRawMaterialQuery);
 				updateStock.setInt(1, neededAmount);
 				updateStock.setString(2,  amounts.getString("RawMaterial.ingredientName"));
 				updateStock.executeUpdate();
@@ -363,7 +363,7 @@ public class BackEnd {
 		Vector<Vector<String>> list = new Vector<Vector<String>>();
 		
 		try{
-			PreparedStatement searchByCustomer = conn.prepareStatement("select orderNumber, palletNumber, deliveryDate from Ordering natural join Pallet where customerName = ?");
+			PreparedStatement searchByCustomer = conn.prepareStatement(getCustomerOrderQuery);
 			searchByCustomer.setString(1, customer);
 			ResultSet searchResult = searchByCustomer.executeQuery();
 			while(searchResult.next()){
@@ -390,8 +390,7 @@ public class BackEnd {
 		String cookieName;
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
 		try{
-			
-			PreparedStatement palletOrder = conn.prepareStatement("select cookieName, nbrOfPallets from PalletOrder where orderNumber = ?");
+			PreparedStatement palletOrder = conn.prepareStatement(getPalletOrderInfoQuery);
 			palletOrder.setInt(1, orderNbr);
 			ResultSet palletOrders = palletOrder.executeQuery();
 			conn.setAutoCommit(false);
@@ -399,7 +398,7 @@ public class BackEnd {
 				
 				cookieName = palletOrders.getString("cookieName");
 				int neededPallets = palletOrders.getInt("nbrOfPallets");
-				PreparedStatement palletNbr = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? and status='in storage' and QA = 'passed'");
+				PreparedStatement palletNbr = conn.prepareStatement(getPalletNumberQuery);
 				palletNbr.setString(1, cookieName);
 				ResultSet palletNbrResult = palletNbr.executeQuery();
 				
@@ -408,7 +407,7 @@ public class BackEnd {
 				while(palletNbrResult.next() && palletCount < neededPallets){
 					int palletId = palletNbrResult.getInt(1);
 					palletList.add(palletId);
-					PreparedStatement movePalletStmt = conn.prepareStatement("update Pallet set status = 'delivered', orderNumber = ? where palletNumber = ?");
+					PreparedStatement movePalletStmt = conn.prepareStatement(updateMovePalletQuery);
 					movePalletStmt.setInt(1, orderNbr);
 					movePalletStmt.setInt(2,  palletId);
 					movePalletStmt.executeUpdate();
@@ -418,14 +417,12 @@ public class BackEnd {
 					conn.rollback();
 					return null;
 				}
-				
-				PreparedStatement deletePalletOrder = conn.prepareStatement("delete from PalletOrder where orderNumber = ? and cookieName = ?");
+				PreparedStatement deletePalletOrder = conn.prepareStatement(deletePalletOrderQuery);
 				deletePalletOrder.setInt(1, orderNbr);
 				deletePalletOrder.setString(2, cookieName);
 				deletePalletOrder.executeUpdate();
 			}
-
-			PreparedStatement updateOrdering = conn.prepareStatement("update Ordering set deliveryDate = now() where orderNumber = ? ");
+			PreparedStatement updateOrdering = conn.prepareStatement(updateOrderingQuery);
 			updateOrdering.setInt(1,  orderNbr);
 			updateOrdering.executeUpdate();
 				
@@ -516,7 +513,7 @@ public class BackEnd {
 	
 	public boolean palletInProd(int palletNbr) {
 		try{
-		PreparedStatement checkIfInProd = conn.prepareStatement("select * from Pallet where status = 'in production' and palletNumber = ?");
+		PreparedStatement checkIfInProd = conn.prepareStatement(getPalletStatusInfoQuery);
 		checkIfInProd.setInt(1, palletNbr);
 		ResultSet isInProd = checkIfInProd.executeQuery();
 		

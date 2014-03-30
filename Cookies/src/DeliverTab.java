@@ -35,7 +35,6 @@ public class DeliverTab {
 						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
 						return;
 					}
-					//TODO: implementera den nedanför
 					ArrayList<Integer> deliveredPallets = be.movePalletToDelivered(orderNbr);
 					if(deliveredPallets == null) {
 						JOptionPane.showMessageDialog(null, "The order has already been delivered");						
