@@ -1,5 +1,6 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -35,8 +36,12 @@ public class DeliverTab {
 						return;
 					}
 					//TODO: implementera den nedanför
-					if(be.movePalletToDelivered(orderNbr).isEmpty()) {
-						JOptionPane.showMessageDialog(null, "An order with that number has already been delivered");
+					ArrayList<Integer> deliveredPallets = be.movePalletToDelivered(orderNbr);
+					if(deliveredPallets == null) {
+						JOptionPane.showMessageDialog(null, "The order has already been delivered");						
+					} else if(deliveredPallets.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "There are not enough pallets to deliver the order");						
+
 					}else {
 						JOptionPane.showMessageDialog(null, "Order number " + orderNbr + " has been delivered");
 					}

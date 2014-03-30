@@ -41,9 +41,9 @@ public class SearchCookieTab {
 
 			private TableModel buildCookieTableModel(String status) {
 				Vector<String> columnNames = new Vector<String>();
+				columnNames.add("Batch Id");
 				columnNames.add("Pallet Id");
 				columnNames.add("Status");
-				columnNames.add("Batch Id");
 				columnNames.add("QA-result");
 				Vector<Vector<String>> data = be.searchByCookie(status);
 				return new DefaultTableModel(data, columnNames);

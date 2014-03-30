@@ -82,7 +82,7 @@ public class GUI {
 
 		// Move PANEL ////////////////////////////
 		JPanel movePanel = new JPanel();
-		tabbedPane_1.addTab("Move pallet", null, movePanel, null);
+		tabbedPane_1.addTab("Move pallet to storage", null, movePanel, null);
 		movePanel.setLayout(null);
 		new MoveTab(be, movePanel);
 		

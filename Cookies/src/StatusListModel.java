@@ -10,7 +10,10 @@ import javax.swing.AbstractListModel;
 		private ArrayList<String> statuses = new ArrayList<String>();
 
 		public StatusListModel(BackEnd be){
-			statuses = be.getStatuses(); // TODO : detta updateras inte dynamiskt 
+			statuses.add("Blocked");
+			statuses.add("Delivered");
+			statuses.add("In production");
+			statuses.add("In storage");
 		}
 
 		@Override
