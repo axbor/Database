@@ -28,7 +28,6 @@ public class BackEnd {
 	private String getPalletsInBatchQuery; 
 	private String searchByCookieQuery;
 	private String searchByDateQuery;
-
 	private String palletExistsQuery;
 	private String getCustomersQuery;
 	private String getOrderInfoQuery;
@@ -42,6 +41,11 @@ public class BackEnd {
 	private String updateOrderingQuery;
 	private String getPalletStatusInfoQuery;
 
+	private String checkBatchQuery;
+	private String getPassPalletQuery;
+	private String setPassedQuery;
+	private String checkBatchUnpassedQuery;
+	private String getDeliverydateQuery; 
 	
 	public BackEnd(){
 		conn = null;
@@ -75,9 +79,12 @@ public class BackEnd {
 		deletePalletOrderQuery = "delete from PalletOrder where orderNumber = ? and cookieName = ?";
 		updateOrderingQuery = "update Ordering set deliveryDate = now() where orderNumber = ? ";
 		getPalletStatusInfoQuery = "select * from Pallet where status = 'in production' and palletNumber = ?";
+		checkBatchQuery = "select * from productionBatch where batchNumber = ? and QA = 'untested'";
+		getPassPalletQuery = "select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?";
+		setPassedQuery = "update productionBatch set QA='passed' where batchNumber = ? ";
+		checkBatchUnpassedQuery = "select * from productionBatch where batchNumber = ? and QA = 'untested'";
+		getDeliverydateQuery = "select deliveryDate from Ordering where orderNumber = ? and deliveryDate is null";
 
-
-		//TODO : flytta upp queries hit ?
 	}
 	
 	public boolean openConnection() {
@@ -389,13 +396,20 @@ public class BackEnd {
 		
 		String cookieName;
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
+		boolean orderExistsFlag = false;
+
 		try{
+			PreparedStatement checkOrder = conn.prepareStatement(getDeliverydateQuery);
+			checkOrder.setInt(1, orderNbr);
+			if(!checkOrder.executeQuery().next()){
+				return null;
+			}
 			PreparedStatement palletOrder = conn.prepareStatement(getPalletOrderInfoQuery);
 			palletOrder.setInt(1, orderNbr);
 			ResultSet palletOrders = palletOrder.executeQuery();
 			conn.setAutoCommit(false);
 			while(palletOrders.next()){
-				
+				orderExistsFlag = true;
 				cookieName = palletOrders.getString("cookieName");
 				int neededPallets = palletOrders.getInt("nbrOfPallets");
 				PreparedStatement palletNbr = conn.prepareStatement(getPalletNumberQuery);
@@ -415,7 +429,8 @@ public class BackEnd {
 				}
 				if (palletCount < neededPallets){
 					conn.rollback();
-					return null;
+					palletList.clear();
+					return palletList;
 				}
 				PreparedStatement deletePalletOrder = conn.prepareStatement(deletePalletOrderQuery);
 				deletePalletOrder.setInt(1, orderNbr);
@@ -442,8 +457,11 @@ public class BackEnd {
 	 			return null;
 	 			
 			}
-			
-			return palletList;
+			if(orderExistsFlag){
+				return palletList;
+			} else {
+				return null;
+			}
 	}
 	
 	public boolean movePalletToStorage(int palletNbr){
@@ -538,17 +556,17 @@ public class BackEnd {
 		}
 		
 		try{
-			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			PreparedStatement checkBatch = conn.prepareStatement(checkBatchUnpassedQuery);
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
 				return palletList;
 			}
 			
-			PreparedStatement passed = conn.prepareStatement("update productionBatch set QA='passed' where batchNumber = ? ");
+			PreparedStatement passed = conn.prepareStatement(setPassedQuery);
 			passed.setInt(1,  batchNbr);
 			passed.executeUpdate();
 		
-			PreparedStatement getPalletIds = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?");
+			PreparedStatement getPalletIds = conn.prepareStatement(getPassPalletQuery);
 			getPalletIds.setInt(1, batchNbr);
 			ResultSet palletIds = getPalletIds.executeQuery();
 			while(palletIds.next()){
@@ -572,7 +590,7 @@ public class BackEnd {
 		}
 		try {
 			
-			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			PreparedStatement checkBatch = conn.prepareStatement(checkBatchQuery);
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
 				return blockedPalletsNbr;
