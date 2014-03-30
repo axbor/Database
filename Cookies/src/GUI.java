@@ -193,8 +193,8 @@ public class GUI {
 
 			private TableModel buildStatusTableModel(String status) {
 				Vector<String> columnNames = new Vector<String>();
-				columnNames.add("Pallet Id");
 				columnNames.add("Batch Id");
+				columnNames.add("Pallet Id");
 				columnNames.add("Cookie");
 				columnNames.add("QA-result");
 				Vector<Vector<String>> data = be.searchByStatus(status);
@@ -486,12 +486,12 @@ public class GUI {
 						return;
 					}
 					if(!be.orderExist(orderNbr)) {
-						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
+						JOptionPane.showMessageDialog(null, "An order with that number does not exist2");
 						return;
 					}
 					//TODO: implementera den nedanför
 					if(!be.movePalletToDelivered(orderNbr)) {
-						JOptionPane.showMessageDialog(null, "An order with that number does not exist");
+						JOptionPane.showMessageDialog(null, "An order with that number does not exist3");
 					}else {
 						JOptionPane.showMessageDialog(null, "Order number " + orderNbr + " has been d");
 					}
@@ -530,7 +530,7 @@ public class GUI {
 						JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
 						return;
 					}
-					if(!be.pallletInProd(palletNbr)) {
+					if(!be.palletInProd(palletNbr)) {
 						JOptionPane.showMessageDialog(null, "The pallet is not in production any more");
 					}else if(!be.movePalletToStorage(palletNbr)) {
 						JOptionPane.showMessageDialog(null, "The pallet does not exist");
@@ -589,7 +589,7 @@ public class GUI {
 		private ArrayList<String> statuses = new ArrayList<String>();
 
 		public StatusListModel(BackEnd be){
-			statuses = be.getStatuses();
+			statuses = be.getStatuses(); // TODO : detta updateras inte dynamiskt 
 		}
 
 		@Override
