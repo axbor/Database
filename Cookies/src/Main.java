@@ -1,7 +1,4 @@
-import java.util.Vector;
-
-
-public class main {
+public class Main {
 
 	/**
 	 * @param args
