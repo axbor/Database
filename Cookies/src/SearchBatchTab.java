@@ -22,7 +22,7 @@ public class SearchBatchTab {
 		searchBatchPanel.add(label_2);
 		
 		final JTextArea textArea_3 = new JTextArea();
-		JButton button_1 = new JButton("Ok");
+		JButton button_1 = new JButton("Search");
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = textField_2.getText();

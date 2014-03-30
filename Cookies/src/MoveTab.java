@@ -30,15 +30,13 @@ public class MoveTab {
 						JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
 						return;
 					}
-					if(!be.palletInProd(palletNbr)) {
-						JOptionPane.showMessageDialog(null, "The pallet is not in production any more");
-					}else if(!be.movePalletToStorage(palletNbr)) {
+					boolean inProd = be.palletInProd(palletNbr); 
+					boolean moved = be.movePalletToStorage(palletNbr);
+					if(inProd && moved) {
+						JOptionPane.showMessageDialog(null, "The palllet has been moved to storage");
+					} else {
 						JOptionPane.showMessageDialog(null, "The pallet does not exist");
-						return;
-					}else {
-						JOptionPane.showMessageDialog(null, "The pallet has been moved to storage");
 					}
-					
 				}catch(NumberFormatException err) {
 					JOptionPane.showMessageDialog(null, "The pallet number has to be a positive integer");
 				}

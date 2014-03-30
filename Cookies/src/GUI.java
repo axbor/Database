@@ -24,7 +24,7 @@ public class GUI {
 
 		//create Tab /////////////////////////
 		JPanel createPanel = new JPanel();
-		tabbedPane_1.addTab("Create pallet", null, createPanel, null);
+		tabbedPane_1.addTab("Create batch", null, createPanel, null);
 		createPanel.setLayout(null);
 		new CreateTab(be, createPanel);
 		

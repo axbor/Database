@@ -23,7 +23,7 @@ public class SearchPalletTab {
 		
 		final JTextArea textArea_1 = new JTextArea();
 		
-		JButton button = new JButton("Ok");
+		JButton button = new JButton("Search");
 		textArea_1.setEditable(false);
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {

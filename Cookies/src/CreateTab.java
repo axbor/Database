@@ -48,7 +48,7 @@ public class CreateTab {
 		createPanel.add(cookieAmountField);
 		cookieAmountField.setColumns(10);
 
-		JButton btnOk = new JButton("Create pallet");
+		JButton btnOk = new JButton("Create batch");
 		btnOk.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String text = cookieAmountField.getText();
