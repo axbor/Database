@@ -63,206 +63,39 @@ public class GUI {
 		tabbedPane_1.addTab("Create pallet", null, createPanel, null);
 		createPanel.setLayout(null);
 
-		list = new JList<String>();
-		list.setModel(new CookieListModel(be));
-		list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setViewportView(list);
-		createPanel.add(scrollPane);
-		scrollPane.setBounds(50, 94, 150, 200);
-
-		cookieAmountField = new JTextField();
-		cookieAmountField.setBounds(368, 195, 144, 62);
-		createPanel.add(cookieAmountField);
-		cookieAmountField.setColumns(10);
-
-		JButton btnOk = new JButton("Create pallet");
-		btnOk.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String text = cookieAmountField.getText();
-				try{
-					amount = Integer.parseInt(text);
-					if(amount < 1) {
-						JOptionPane.showMessageDialog(null, "Amount has to be bigger than 0");
-					}else {
-						int index = list.getSelectedIndex();
-						ListModel<String> model = list.getModel();
-						String cookie = model.getElementAt(index);
-						ArrayList<Integer> palletNbrs = be.createBatch(cookie, amount);
-				
-						StringBuilder sb = new StringBuilder();
-						sb.append("\n");
-						for(int nbr : palletNbrs){
-							
-							sb.append(nbr);
-							sb.append("\n");
-							
-						}
-						String pallets = sb.toString();
-						
-						JOptionPane.showMessageDialog(null, "Created " + amount + " pallets of " + cookie + " with pallet-id " +
-						pallets);
-					}
-				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
-				}
-			}
-		});
-		btnOk.setBounds(368, 290, 155, 25);
-		createPanel.add(btnOk);
-
-		JLabel lblAmountOfPallets = new JLabel("Enter amount of pallets you want to create of selected cookie");
-		lblAmountOfPallets.setBounds(218, 114, 448, 44);
-		createPanel.add(lblAmountOfPallets);
-
-		JLabel lblChooseACookie = new JLabel("Choose a cookie type to create");
-		lblChooseACookie.setBounds(33, 51, 221, 15);
-		createPanel.add(lblChooseACookie);
+		new CreateTab(be, createPanel);
 		
 		
 		//search Tab /////////////////////////
 		
 		JTabbedPane searchPane = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane_1.addTab("Search", null, searchPane, null);
+		
 		//search cookie Tab /////////////////////////
 		
 		JPanel searchCookiePanel = new JPanel();
 		searchPane.addTab("By cookie", null, searchCookiePanel, null);
 		searchCookiePanel.setLayout(null);
 		
-		final JList<String> cookieList = new JList<String>();
-		cookieList.setModel(new CookieListModel(be));
-		cookieList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		JScrollPane cookieScrollPane = new JScrollPane();
-		cookieScrollPane.setViewportView(cookieList);
-		searchCookiePanel.add(cookieScrollPane);
-		cookieScrollPane.setBounds(12, 12, 148, 364);		
-		
-		JButton btnOk_1 = new JButton("Search");
-		btnOk_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					int index = cookieList.getSelectedIndex();
-					ListModel<String> model = cookieList.getModel();
-					String cookieName = model.getElementAt(index);
-					table = new JTable(buildCookieTableModel(cookieName));
-					JOptionPane.showMessageDialog(null, new JScrollPane(table));
-				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
-				}
-			}
-
-			private TableModel buildCookieTableModel(String status) {
-				Vector<String> columnNames = new Vector<String>();
-				columnNames.add("Pallet Id");
-				columnNames.add("Status");
-				columnNames.add("Batch Id");
-				columnNames.add("QA-result");
-				Vector<Vector<String>> data = be.searchByCookie(status);
-				return new DefaultTableModel(data, columnNames);
-			}
-		});
-		btnOk_1.setBounds(172, 189, 117, 25);
-		searchCookiePanel.add(btnOk_1);
+		new SearchCookieTab(be, searchCookiePanel);
 		
 		//search status Tab /////////////////////////
 		
-		JPanel searchStatuspanel = new JPanel();
-		searchPane.addTab("By status", null, searchStatuspanel, null);
-		searchStatuspanel.setLayout(null);
+		JPanel searchStatusPanel = new JPanel();
+		searchPane.addTab("By status", null, searchStatusPanel, null);
+		searchStatusPanel.setLayout(null);
 		
-		final JList<String> statusList = new JList<String>();
-		statusList.setModel(new StatusListModel(be));
-		statusList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-		statusList.setBounds(12, 49, 148, 364);
-		searchStatuspanel.add(statusList);
-
-		JButton button_3 = new JButton("Search");
-		button_3.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				try{
-					int index = statusList.getSelectedIndex();
-					ListModel<String> model = statusList.getModel();
-					String status = model.getElementAt(index);
-					table_2 = new JTable(buildStatusTableModel(status));
-					JOptionPane.showMessageDialog(null, new JScrollPane(table_2));
-				}catch(NumberFormatException err) {
-					JOptionPane.showMessageDialog(null, "Amount has to be an integer bigger than 0");
-				}
-			}
-
-			private TableModel buildStatusTableModel(String status) {
-				Vector<String> columnNames = new Vector<String>();
-				columnNames.add("Batch Id");
-				columnNames.add("Pallet Id");
-				columnNames.add("Cookie");
-				columnNames.add("QA-result");
-				Vector<Vector<String>> data = be.searchByStatus(status);
-				return new DefaultTableModel(data, columnNames);
-			}
-		});
-		button_3.setBounds(172, 226, 117, 25);
-		searchStatuspanel.add(button_3);
+		new SearchStatusTab(be, searchStatusPanel);
 		
 		
 		
 		//search time Tab /////////////////////////
 		
-		JPanel searchTimepanel = new JPanel();
-		searchPane.addTab("By time", null, searchTimepanel, null);
-		searchTimepanel.setLayout(null);
+		JPanel searchTimePanel = new JPanel();
+		searchPane.addTab("By time", null, searchTimePanel, null);
+		searchTimePanel.setLayout(null);
 		
-		JLabel lblEnterTheTime = new JLabel("Enter the production time interval you want to search pallets for");
-		lblEnterTheTime.setBounds(89, 25, 504, 15);
-		searchTimepanel.add(lblEnterTheTime);
-		
-		JLabel lblNewLabel_1 = new JLabel("Start date");
-		lblNewLabel_1.setBounds(89, 68, 92, 15);
-		searchTimepanel.add(lblNewLabel_1);
-		
-		JLabel lblEndDate = new JLabel("End date");
-		lblEndDate.setBounds(212, 68, 70, 15);
-		searchTimepanel.add(lblEndDate);
-		
-		startDateField = new JTextField();
-		startDateField.setBounds(66, 95, 114, 19);
-		searchTimepanel.add(startDateField);
-		startDateField.setColumns(10);
-		
-		endDateField = new JTextField();
-		endDateField.setBounds(203, 95, 114, 19);
-		searchTimepanel.add(endDateField);
-		endDateField.setColumns(10);
-		
-		JButton btnSearch = new JButton("Search");
-		btnSearch.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String startDateString = startDateField.getText();
-				String endDateString = endDateField.getText(); 
-				try{
-					java.sql.Date startDate = java.sql.Date.valueOf(startDateString);
-					java.sql.Date endDate = java.sql.Date.valueOf(endDateString);
-					timeTable= new JTable(buildTimeTableModel(startDate, endDate));
-					JOptionPane.showMessageDialog(null, new JScrollPane(timeTable));
-				}catch(IllegalArgumentException err) {
-					JOptionPane.showMessageDialog(null, "Date has to be on the form : YYYY-MM-DD");
-				}
-			}
-
-			private TableModel buildTimeTableModel(java.sql.Date startDate, java.sql.Date endDate) {
-				Vector<String> columnNames = new Vector<String>();
-				columnNames.add("Batch Id");
-				columnNames.add("Pallet Id");
-				columnNames.add("Cookie");
-				columnNames.add("Status");
-				columnNames.add("QA-result");
-				columnNames.add("Prod. date");
-				Vector<Vector<String>> data = be.searchByDate(startDate, endDate);
-				return new DefaultTableModel(data, columnNames);
-			}
-		});
-		btnSearch.setBounds(405, 92, 117, 25);
-		searchTimepanel.add(btnSearch);
+		new SearchTimeTab(be, searchTimePanel);
 		
 		//search pallet Tab /////////////////////////
 		JPanel searchPalletpanel = new JPanel();
