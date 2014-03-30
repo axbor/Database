@@ -1,9 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.swing.AbstractListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -52,24 +50,4 @@ public class SearchStatusTab {
 		button_3.setBounds(172, 226, 117, 25);
 		searchStatusPanel.add(button_3);
 	}
-	
-	
-	class StatusListModel extends AbstractListModel<String> {
-		private ArrayList<String> statuses = new ArrayList<String>();
-
-		public StatusListModel(BackEnd be){
-			statuses = be.getStatuses(); // TODO : detta updateras inte dynamiskt 
-		}
-
-		@Override
-		public int getSize() {
-			return statuses.size();
-		}
-
-		@Override
-		public String getElementAt(int index) {
-			return statuses.get(index);
-		}
-	}
-	
 }
