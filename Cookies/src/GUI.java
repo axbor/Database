@@ -69,10 +69,10 @@ public class GUI {
 		new SearchCustomerTab(be, searchCustomerPanel);
 
 		//blocking panel /////////////////////////////////
-		JPanel blockingPanel = new JPanel();
-		tabbedPane_1.addTab("Block batch", null, blockingPanel, null);
-		blockingPanel.setLayout(null);
-		new BlockingTab(be, blockingPanel);
+		JPanel qaPanel = new JPanel();
+		tabbedPane_1.addTab("QA-test", null, qaPanel, null);
+		qaPanel.setLayout(null);
+		new QATab(be, qaPanel);
 		
 		// DELIVER PANEL ////////////////////////////
 		JPanel deliverPanel = new JPanel();
@@ -86,6 +86,8 @@ public class GUI {
 		movePanel.setLayout(null);
 		new MoveTab(be, movePanel);
 		
+		
 		frame.setVisible(true);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 	}
 }
