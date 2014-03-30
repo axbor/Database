@@ -38,6 +38,7 @@ public class BackEnd {
 	private String setPassedQuery;
 	private String checkBatchUnpassedQuery;
 	private String getDeliverydateQuery; 
+	private String getCustomerInfoQuery;
 	
 	public BackEnd(){
 		conn = null;
@@ -74,7 +75,7 @@ public class BackEnd {
 		setPassedQuery = "update productionBatch set QA='passed' where batchNumber = ? ";
 		checkBatchUnpassedQuery = "select * from productionBatch where batchNumber = ? and QA = 'untested'";
 		getDeliverydateQuery = "select deliveryDate from Ordering where orderNumber = ? and deliveryDate is null";
-
+		getCustomerInfoQuery = "select deliveryDate, customerName from Ordering where orderNumber = ?";
 	}
 	
 	public boolean openConnection() {
@@ -147,7 +148,12 @@ public class BackEnd {
 			sb.append("Pallet number " + palletNbr + " was made in batch " + Integer.toString(palletInfoSet.getInt("batchNumber")));
 			int orderNbr = palletInfoSet.getInt("orderNumber");
 			if( orderNbr != 0){
-				sb.append("\n It has order number " + orderNbr);
+				PreparedStatement checkCustomer = conn.prepareStatement(getCustomerInfoQuery);
+				checkCustomer.setInt(1, orderNbr);
+				ResultSet customer = checkCustomer.executeQuery();
+				if(customer.next()){
+					sb.append("\n It has order number " + orderNbr + " and was delivered " + customer.getTimestamp("deliveryDate").toString() + " to " + customer.getString("customerName"));
+				}
 			}
 			sb.append("\nIt's status is currently " + palletInfoSet.getString("status") + " it was produced " + palletInfoSet.getDate("prodDate")); 
 			}
