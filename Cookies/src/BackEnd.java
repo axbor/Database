@@ -28,11 +28,13 @@ public class BackEnd {
 	private String getPalletsInBatchQuery; 
 	private String searchByCookieQuery;
 	private String searchByDateQuery;
-
 	private String palletExistsQuery;
 	private String getCustomersQuery;
 	private String getOrderInfoQuery;
-	
+	private String checkBatchQuery;
+	private String getPassPalletQuery;
+	private String setPassedQuery;
+	private String checkBatchUnpassedQuery;
 	
 	public BackEnd(){
 		conn = null;
@@ -57,6 +59,10 @@ public class BackEnd {
 		palletExistsQuery = "select * from Pallet where palletNumber = ?";
 		getCustomersQuery = "select customerName from Customer";
 		getOrderInfoQuery = "select * from Ordering where orderNumber = ?";
+		checkBatchQuery = "select * from productionBatch where batchNumber = ? and QA = 'untested'";
+		getPassPalletQuery = "select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?";
+		setPassedQuery = "update productionBatch set QA='passed' where batchNumber = ? ";
+		checkBatchUnpassedQuery = "select * from productionBatch where batchNumber = ? and QA = 'untested'";
 		//TODO : flytta upp queries hit ?
 	}
 	
@@ -553,17 +559,17 @@ public class BackEnd {
 		}
 		
 		try{
-			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			PreparedStatement checkBatch = conn.prepareStatement(checkBatchUnpassedQuery);
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
 				return palletList;
 			}
 			
-			PreparedStatement passed = conn.prepareStatement("update productionBatch set QA='passed' where batchNumber = ? ");
+			PreparedStatement passed = conn.prepareStatement(setPassedQuery);
 			passed.setInt(1,  batchNbr);
 			passed.executeUpdate();
 		
-			PreparedStatement getPalletIds = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?");
+			PreparedStatement getPalletIds = conn.prepareStatement(getPassPalletQuery);
 			getPalletIds.setInt(1, batchNbr);
 			ResultSet palletIds = getPalletIds.executeQuery();
 			while(palletIds.next()){
@@ -587,7 +593,7 @@ public class BackEnd {
 		}
 		try {
 			
-			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			PreparedStatement checkBatch = conn.prepareStatement(checkBatchQuery);
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
 				return blockedPalletsNbr;
