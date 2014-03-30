@@ -54,6 +54,10 @@ public class SearchCustomerTab {
 	}
 	
 	class CustomerListModel extends AbstractListModel<String> {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		private ArrayList<String> customers = new ArrayList<String>();
 
 		public CustomerListModel(BackEnd be){
