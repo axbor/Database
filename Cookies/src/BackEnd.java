@@ -536,19 +536,23 @@ public class BackEnd {
 	public ArrayList<Integer> passBatch(int batchNbr){
 		
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
-		if(!batchExist(batchNbr)){
-			return null;
-		}
+
 		
 		try{
-		PreparedStatement passed = conn.prepareStatement("update productionBatch set QA='passed' where batchNumber = ?");
-		passed.setInt(1,  batchNbr);
-		passed.executeUpdate();
+			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			checkBatch.setInt(1,  batchNbr);
+			if(!checkBatch.executeQuery().next()){
+				return null;
+			}
+			
+			PreparedStatement passed = conn.prepareStatement("update productionBatch set QA='passed' where batchNumber = ? ");
+			passed.setInt(1,  batchNbr);
+			passed.executeUpdate();
 		
-		PreparedStatement getPalletIds = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?");
-		getPalletIds.setInt(1, batchNbr);
-		ResultSet palletIds = getPalletIds.executeQuery();
-		while(palletIds.next()){
+			PreparedStatement getPalletIds = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch where batchNumber = ?");
+			getPalletIds.setInt(1, batchNbr);
+			ResultSet palletIds = getPalletIds.executeQuery();
+			while(palletIds.next()){
 			palletList.add(palletIds.getInt(1));
 		}
 		
@@ -557,7 +561,7 @@ public class BackEnd {
 			return null;
 		}
 		
-		return null;
+		return palletList;
 	}
 
 	public ArrayList<Integer> blockBatch(int batchNbr) {
@@ -568,9 +572,17 @@ public class BackEnd {
 			return null;
 		}
 		try {
+			
+			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
+			checkBatch.setInt(1,  batchNbr);
+			if(!checkBatch.executeQuery().next()){
+				return null;
+			}
+			
+			
 			blockBatches = conn.prepareStatement(blockBatchQuery);
 			blockBatches.setInt(1, batchNbr);
-			blockBatches.execute();
+			blockBatches.executeUpdate();
 		
 		
 		PreparedStatement blockPalletsNbr = conn.prepareStatement(getBlockedPalletsQuery);
