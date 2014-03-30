@@ -388,14 +388,22 @@ public class BackEnd {
 		
 		String cookieName;
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
+		boolean orderExistsFlag = false;
+
 		try{
+			PreparedStatement checkOrder = conn.prepareStatement("select deliveryDate from Ordering where orderNumber = ? and deliveryDate is null");
+			checkOrder.setInt(1, orderNbr);
+			
+			if(!checkOrder.executeQuery().next()){
+				return null;
+			}
 			
 			PreparedStatement palletOrder = conn.prepareStatement("select cookieName, nbrOfPallets from PalletOrder where orderNumber = ?");
 			palletOrder.setInt(1, orderNbr);
 			ResultSet palletOrders = palletOrder.executeQuery();
 			conn.setAutoCommit(false);
 			while(palletOrders.next()){
-				
+				orderExistsFlag = true;
 				cookieName = palletOrders.getString("cookieName");
 				int neededPallets = palletOrders.getInt("nbrOfPallets");
 				PreparedStatement palletNbr = conn.prepareStatement("select palletNumber from Pallet natural join PalletsInBatch natural join productionBatch where cookieName = ? and status='in storage' and QA = 'passed'");
@@ -415,7 +423,8 @@ public class BackEnd {
 				}
 				if (palletCount < neededPallets){
 					conn.rollback();
-					return null;
+					palletList.clear();
+					return palletList;
 				}
 				
 				PreparedStatement deletePalletOrder = conn.prepareStatement("delete from PalletOrder where orderNumber = ? and cookieName = ?");
@@ -444,8 +453,11 @@ public class BackEnd {
 	 			return null;
 	 			
 			}
-			
-			return palletList;
+			if(orderExistsFlag){
+				return palletList;
+			} else {
+				return null;
+			}
 	}
 	
 	public boolean movePalletToStorage(int palletNbr){
