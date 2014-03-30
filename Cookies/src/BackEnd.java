@@ -537,12 +537,15 @@ public class BackEnd {
 		
 		ArrayList<Integer> palletList = new ArrayList<Integer>();
 
+		if(!batchExist(batchNbr)) {
+			return palletList;
+		}
 		
 		try{
 			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
-				return null;
+				return palletList;
 			}
 			
 			PreparedStatement passed = conn.prepareStatement("update productionBatch set QA='passed' where batchNumber = ? ");
@@ -569,14 +572,14 @@ public class BackEnd {
 		ArrayList<Integer> blockedPalletsNbr = new ArrayList<Integer>();
 
 		if(!batchExist(batchNbr)) {
-			return null;
+			return blockedPalletsNbr;
 		}
 		try {
 			
 			PreparedStatement checkBatch = conn.prepareStatement("select * from productionBatch where batchNumber = ? and QA = 'untested'");
 			checkBatch.setInt(1,  batchNbr);
 			if(!checkBatch.executeQuery().next()){
-				return null;
+				return blockedPalletsNbr;
 			}
 			
 			
